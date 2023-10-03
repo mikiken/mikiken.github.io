@@ -19,6 +19,8 @@
   - Development Course, C Compiler Workshop
 - Internship at KLab Inc. (2023/08/24 ~ 2023/08/30)
   - [KLab Expert Camp 6th](https://klab-hr.snar.jp/jobboard/detail.aspx?id=ceG7Rw98wQU) (TCP/IP Protocol Stack Homebrew Development #4)
+- Internship at Turing Inc. (2023/09/11~2023/09/26)
+  - UX Engineering Team
 
 ### Links
 - GitHub : [mikiken](https://github.com/mikiken)
