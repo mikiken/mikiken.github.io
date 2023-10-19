@@ -28,5 +28,6 @@
 - Misskey : [@mikiken@social.camph.net](https://social.camph.net/@mikiken)
 - Discord : [mikiken](https://discordapp.com/users/mikiken)
 - SpeakerDeck : [mikiken](https://speakerdeck.com/mikiken)
+- Zenn : [mikiken](https://zenn.dev/mikiken)
 
 
