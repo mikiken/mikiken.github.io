@@ -1,11 +1,9 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
     <channel>
-        <title>mikiken.net</title>
-        <link>https://mikiken.net/</link>
-        <description>mikiken.net</description>
-        <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Sun, 20 Aug 2023 17:23:57 &#43;0900</lastBuildDate>
-            <atom:link href="https://mikiken.net/index.xml" rel="self" type="application/rss+xml" />
-        <item>
+        <title>All Posts - mikiken.net</title>
+        <link>https://mikiken.net/posts/</link>
+        <description>All Posts | mikiken.net</description>
+        <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Thu, 26 Oct 2023 17:49:53 &#43;0900</lastBuildDate><atom:link href="https://mikiken.net/posts/" rel="self" type="application/rss+xml" /><item>
     <title>&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ</title>
     <link>https://mikiken.net/writing-an-os-in-1000-lines-setup/</link>
     <pubDate>Thu, 26 Oct 2023 17:49:53 &#43;0900</pubDate>

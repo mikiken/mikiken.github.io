@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ - mikiken.net</title><meta name="Description" content=""><meta property="og:title" content="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ" />
+<meta property="og:description" content="同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
+https://zenn.dev/mikiken/scraps/483401c1bef8a1
+本の記述に従い環境構築をしてみた
+https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment
+しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
+1 2 3 4  ❯ ./run.sh &#43; QEMU=qemu-system-riscv32 &#43; qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
+そこで、run.shを以下のように変更した
+1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない
+1 2 3 4 5 6  ❯ ." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://mikiken.net/writing-an-os-in-1000-lines-setup/" />
+<meta property="article:published_time" content="2023-10-26T17:49:53+09:00" />
+<meta property="article:modified_time" content="2023-10-26T17:49:53+09:00" /><meta property="og:site_name" content="mikiken.net" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ"/>
+<meta name="twitter:description" content="同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
+https://zenn.dev/mikiken/scraps/483401c1bef8a1
+本の記述に従い環境構築をしてみた
+https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment
+しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
+1 2 3 4  ❯ ./run.sh &#43; QEMU=qemu-system-riscv32 &#43; qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
+そこで、run.shを以下のように変更した
+1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない
+1 2 3 4 5 6  ❯ ."/>
+<meta name="application-name" content="mikiken.net">
+<meta name="apple-mobile-web-app-title" content="mikiken.net"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="https://mikiken.net/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://mikiken.net/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://mikiken.net/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="https://mikiken.net/apple-touch-icon.png"><link rel="mask-icon" href="https://mikiken.net/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="https://mikiken.net/site.webmanifest"><link rel="canonical" href="https://mikiken.net/writing-an-os-in-1000-lines-setup/" /><link rel="stylesheet" href="https://mikiken.net/css/style.min.d75c775422ffdf10422a8e27633c5a5a5ec48694c17102cd082e3dde34a39bc2.css" integrity="sha256-11x3VCL/3xBCKo4nYzxaWl7EhpTBcQLNCC493jSjm8I="><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "\"Writing an OS in 1000 lines\"の環境構築をしたときのメモ",
+        "inLanguage": "ja",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/mikiken.net\/writing-an-os-in-1000-lines-setup\/"
+        },"genre": "posts","wordcount":  622 ,
+        "url": "https:\/\/mikiken.net\/writing-an-os-in-1000-lines-setup\/","datePublished": "2023-10-26T17:49:53+09:00","dateModified": "2023-10-26T17:49:53+09:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "mikiken"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile"> Profile </a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts"> Posts </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile">Profile</a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts">Posts</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+    <h2 class="toc-title">Contents</h2>
+    <div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">"Writing an OS in 1000 lines"の環境構築をしたときのメモ</h1><div class="post-meta">
+        <div class="post-meta-line"></div>
+        <div class="post-meta-line"><time datetime="2023-10-26">2023-10-26</time>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="">
+        <div class="details-summary toc-title">
+            <span>Contents</span>
+            <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#aptで入れたqemu関係のパッケージを全てアンインストール">aptで入れたQEMU関係のパッケージを全てアンインストール</a></li>
+        <li><a href="#riscv-gnu-toolchainをソースコードからビルドする">riscv-gnu-toolchainをソースコードからビルドする</a></li>
+        <li><a href="#qemuをソースコードからビルドする">QEMUをソースコードからビルドする</a></li>
+        <li><a href="#動作確認">動作確認</a></li>
+        <li><a href="#ldがriscv32向けのelfを吐けない">ldがriscv32向けのelfを吐けない</a></li>
+        <li><a href="#参考にさせていただいたサイト">参考にさせていただいたサイト</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><div class="content" id="content"><p>同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく</p>
+<p><a href="https://zenn.dev/mikiken/scraps/483401c1bef8a1">https://zenn.dev/mikiken/scraps/483401c1bef8a1</a></p>
+<p>本の記述に従い環境構築をしてみた</p>
+<p><a href="https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment">https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment</a></p>
+<p>しかし、<a href="https://operating-system-in-1000-lines.vercel.app/ja/boot" target="_blank" rel="noopener noreffer ">5. ブート</a>の説明通りに<code>run.sh</code>を記述し実行したところ、以下のようなエラーが出た</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">❯ ./run.sh
++ <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
++ qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot
+qemu-system-riscv32: Unable to load the RISC-V firmware <span class="s2">&#34;opensbi-riscv32-virt-fw_jump.bin&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>パッと見た感じ、QEMUが<code>-bios default</code>で呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)</p>
+<p>そこで、<code>run.sh</code>を以下のように変更した</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="nb">set</span> -xue
+
+<span class="c1"># QEMUの実行バイナリへのパス</span>
+<span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
+
+<span class="c1"># QEMUを起動</span>
+<span class="nv">$QEMU</span> -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot
+</code></pre></td></tr></table>
+</div>
+</div><p>すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">❯ ./run.sh
++ QEMU=qemu-system-riscv32
++ qemu-system-riscv32 -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot
+
+
+
+</code></pre></td></tr></table>
+</div>
+</div><p>そこで、以下の手順を試した</p>
+<ol>
+<li>aptで入れたQEMU関係のパッケージを全てアンインストール</li>
+<li>riscv-gnu-toolchainをソースコードからビルドする</li>
+<li>QEMUをソースコードからビルドする</li>
+</ol>
+<h3 id="aptで入れたqemu関係のパッケージを全てアンインストール">aptで入れたQEMU関係のパッケージを全てアンインストール</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo apt-get remove --purge <span class="s2">&#34;qemu-*&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="riscv-gnu-toolchainをソースコードからビルドする">riscv-gnu-toolchainをソースコードからビルドする</h3>
+<p>ビルドに必要なパッケージをインストールしておく。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo apt install -y texinfo bison flex libgmp-dev
+</code></pre></td></tr></table>
+</div>
+</div><p>環境によっては、上記以外にも足りないパッケージがあるかもしれないので、ビルド実行後にエラーが出たら適宜インストールしてから再実行する。</p>
+<p>以下のコマンドを実行し、ソースコードからriscv-gnu-toolchainをビルドする。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ~
+git clone --depth<span class="o">=</span><span class="m">1</span> https://github.com/riscv-collab/riscv-gnu-toolchain.git
+<span class="nb">cd</span> riscv-gnu-toolchain/
+./configure --prefix<span class="o">=</span>/opt/riscv32 --with-arch<span class="o">=</span>rv32i --with-abi<span class="o">=</span>ilp32
+sudo make
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="qemuをソースコードからビルドする">QEMUをソースコードからビルドする</h3>
+<p>この本が書かれたのが2023年の8月頃なので、当時の安定リリースであるQEMUのv8.0系をソースコードからビルドし、インストールする。</p>
+<p>ビルドに必要なパッケージをインストールしておく。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">sudo apt install -y pkg-config ninja-build libglib2.0 libpixman-1-dev
+</code></pre></td></tr></table>
+</div>
+</div><p>環境によっては、上記以外にも足りないパッケージがあるかもしれないので、ビルド実行後にエラーが出たら適宜インストールしてから再実行する。</p>
+<p>以下のコマンドを実行する。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">mkdir ~/qemu <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ~/qemu
+git clone --depth<span class="o">=</span><span class="m">1</span> --branch stable-8.0 https://github.com/qemu/qemu.git
+sudo mkdir /opt/qemu-system-riscv32
+sudo ./configure --target-list<span class="o">=</span>riscv32-softmmu --prefix<span class="o">=</span>/opt/qemu-system-riscv32/
+sudo make -j <span class="k">$(</span>nproc<span class="k">)</span>
+sudo make install
+</code></pre></td></tr></table>
+</div>
+</div><p>ビルドが完了すると、上の<code>--prefix</code>で指定したパスに<code>qemu-system-riscv32</code>という実行バイナリが生成されているはず。そのディレクトリに対してPATHを通す。</p>
+<p>すなわち<code>.bashrc</code>に以下を追加する。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$PATH</span><span class="s2">:/opt/qemu-system-riscv32/bin&#34;</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="動作確認">動作確認</h3>
+<p>本の記述通りに<code>run.sh</code>を記述し、実行した。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">❯ ./run.sh 
++ <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
++ qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot
+
+OpenSBI v1.2
+   ____                    _____ ____ _____
+  / __ <span class="se">\ </span>                 / ____<span class="p">|</span>  _ <span class="se">\_</span>   _<span class="p">|</span>
+ <span class="p">|</span> <span class="p">|</span>  <span class="p">|</span> <span class="p">|</span>_ __   ___ _ __ <span class="p">|</span> <span class="o">(</span>___ <span class="p">|</span> <span class="p">|</span>_<span class="o">)</span> <span class="o">||</span> <span class="p">|</span>
+ <span class="p">|</span> <span class="p">|</span>  <span class="p">|</span> <span class="p">|</span> <span class="s1">&#39;_ \ / _ \ &#39;</span>_ <span class="se">\ \_</span>__ <span class="se">\|</span>  _ &lt; <span class="p">|</span> <span class="p">|</span>
+ <span class="p">|</span> <span class="p">|</span>__<span class="p">|</span> <span class="p">|</span> <span class="p">|</span>_<span class="o">)</span> <span class="p">|</span>  __/ <span class="p">|</span> <span class="p">|</span> <span class="p">|</span>____<span class="o">)</span> <span class="p">|</span> <span class="p">|</span>_<span class="o">)</span> <span class="o">||</span> <span class="p">|</span>_
+  <span class="se">\_</span>___/<span class="p">|</span> .__/ <span class="se">\_</span>__<span class="p">|</span>_<span class="p">|</span> <span class="p">|</span>_<span class="p">|</span>_____/<span class="p">|</span>____/_____<span class="p">|</span>
+        <span class="p">|</span> <span class="p">|</span>
+        <span class="p">|</span>_<span class="p">|</span>
+
+Platform Name             : riscv-virtio,qemu
+Platform Features         : medeleg
+Platform HART Count       : <span class="m">1</span>
+Platform IPI Device       : aclint-mswi
+Platform Timer Device     : aclint-mtimer @ 10000000Hz
+Platform Console Device   : uart8250
+Platform HSM Device       : ---
+Platform PMU Device       : ---
+Platform Reboot Device    : sifive_test
+Platform Shutdown Device  : sifive_test
+Firmware Base             : 0x80000000
+Firmware Size             : <span class="m">208</span> KB
+Runtime SBI Version       : 1.0
+
+Domain0 Name              : root
+Domain0 Boot HART         : <span class="m">0</span>
+Domain0 HARTs             : 0*
+Domain0 Region00          : 0x02000000-0x0200ffff <span class="o">(</span>I<span class="o">)</span>
+Domain0 Region01          : 0x80000000-0x8003ffff <span class="o">()</span>
+Domain0 Region02          : 0x00000000-0xffffffff <span class="o">(</span>R,W,X<span class="o">)</span>
+Domain0 Next Address      : 0x00000000
+Domain0 Next Arg1         : 0x87e00000
+Domain0 Next Mode         : S-mode
+Domain0 SysReset          : yes
+
+Boot HART ID              : <span class="m">0</span>
+Boot HART Domain          : root
+Boot HART Priv Version    : v1.12
+Boot HART Base ISA        : rv32imafdch
+Boot HART ISA Extensions  : time,sstc
+Boot HART PMP Count       : <span class="m">16</span>
+Boot HART PMP Granularity : <span class="m">4</span>
+Boot HART PMP Address Bits: <span class="m">32</span>
+Boot HART MHPM Count      : <span class="m">16</span>
+Boot HART MIDELEG         : 0x00001666
+Boot HART MEDELEG         : 0x00f0b509
+</code></pre></td></tr></table>
+</div>
+</div><p>ひとまず正しく動いてそう</p>
+<h3 id="ldがriscv32向けのelfを吐けない">ldがriscv32向けのelfを吐けない</h3>
+<p>本の<a href="https://operating-system-in-1000-lines.vercel.app/ja/boot" target="_blank" rel="noopener noreffer ">5.ブート</a>の通りに<code>kernel.c</code>, <code>kernel.ld</code>を作成し、<code>run.sh</code>でビルドしようとすると、以下のエラーが出た</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">❯ ./run.sh
++ <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
++ <span class="nv">CC</span><span class="o">=</span>clang
++ <span class="nv">CFLAGS</span><span class="o">=</span><span class="s1">&#39;-std=c11 -O2 -g3 -Wall -Wextra --target=riscv32 -ffreestanding -nostdlib&#39;</span>
++ clang -std<span class="o">=</span>c11 -O2 -g3 -Wall -Wextra --target<span class="o">=</span>riscv32 -ffreestanding -nostdlib -Wl,-Tkernel.ld -Wl,-Map<span class="o">=</span>kernel.map -o kernel.elf kernel.c
+/usr/bin/ld: unrecognised emulation mode: elf32lriscv
+Supported emulations: elf_x86_64 elf32_x86_64 elf_i386 elf_iamcu elf_l1om elf_k1om i386pep i386pe
+clang: error: ld <span class="nb">command</span> failed with <span class="nb">exit</span> code <span class="m">1</span> <span class="o">(</span>use -v to see invocation<span class="o">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>手元の環境のClangはリンカとしてldを呼んでいるが、ldのターゲットにriscv32がない模様</p>
+<p>一旦以下のように<code>ld.lld</code>を別途呼び出すようにしたら、ビルドできるようになった
+(Clangが呼び出すリンカを変更できないか探ったが、よく分からなかった)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="cp">#!/bin/bash
+</span><span class="cp"></span><span class="nb">set</span> -xue
+
+<span class="c1"># QEMUの実行バイナリへのパス</span>
+<span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
+
+<span class="nv">CC</span><span class="o">=</span>clang
+<span class="nv">LINKER</span><span class="o">=</span>ld.lld
+
+<span class="c1"># コンパイルオプション</span>
+<span class="nv">CFLAGS</span><span class="o">=</span><span class="s2">&#34;-c -std=c11 -O2 -g3 -Wall -Wextra --target=riscv32 -ffreestanding -nostdlib -mno-relax&#34;</span>
+
+<span class="c1"># カーネルをビルド</span>
+<span class="nv">$CC</span> <span class="nv">$CFLAGS</span> -o kernel.o kernel.c
+<span class="nv">$LINKER</span> -m elf32lriscv -L/lib -Tkernel.ld -Map<span class="o">=</span>kernel.map kernel.o -o kernel.elf
+
+<span class="c1"># QEMUを起動</span>
+<span class="nv">$QEMU</span> -machine virt -bios default -nographic -serial mon:stdio --no-reboot -kernel kernel.elf
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="参考にさせていただいたサイト">参考にさせていただいたサイト</h3>
+<p><a href="https://qiita.com/ms5/items/74efa5d1ada4912b6a53">https://qiita.com/ms5/items/74efa5d1ada4912b6a53</a></p>
+<p><a href="https://blog.rogiken.org/blog/2023/04/06/32bit-risc-v-linux%E3%82%92%E4%BD%9C%E3%82%8Aqemu%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B/">https://blog.rogiken.org/blog/2023/04/06/32bit-risc-v-linux%E3%82%92%E4%BD%9C%E3%82%8Aqemu%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B/</a></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-10-26</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="https://mikiken.net/writing-an-os-in-1000-lines-setup/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="https://mikiken.net/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://twitter.com/mikikeen" target="_blank">mikiken</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"twemoji":true};</script><script type="text/javascript" src="https://mikiken.net/js/theme.min.d5092a1e0b78bb72d42009815fb9c18a930ce42aeea87444fafc535e0506e833.js" integrity="sha256-1QkqHgt4u3LUIAmBX7nBipMM5CruqHRE+vxTXgUG6DM="></script></body>
+</html>
