@@ -11,7 +11,7 @@ https://zenn.dev/mikiken/scraps/483401c1bef8a1
 https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment
 
 しかし、[5. ブート](https://operating-system-in-1000-lines.vercel.app/ja/boot)の説明通りに`run.sh`を記述し実行したところ、以下のようなエラーが出た
-```bash
+```shell
 ❯ ./run.sh
 + QEMU=qemu-system-riscv32
 + qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot
@@ -32,7 +32,7 @@ QEMU=qemu-system-riscv32
 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot
 ```
 すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない
-```
+```shell
 ❯ ./run.sh
 + QEMU=qemu-system-riscv32
 + qemu-system-riscv32 -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot
@@ -49,20 +49,20 @@ $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -ser
 
 
 ### aptで入れたQEMU関係のパッケージを全てアンインストール
-```bash
+```shell
 sudo apt-get remove --purge "qemu-*"
 ```
 
 
 ### riscv-gnu-toolchainをソースコードからビルドする
 ビルドに必要なパッケージをインストールしておく。
-```bash
+```shell
 sudo apt install -y texinfo bison flex libgmp-dev
 ```
 環境によっては、上記以外にも足りないパッケージがあるかもしれないので、ビルド実行後にエラーが出たら適宜インストールしてから再実行する。
 
 以下のコマンドを実行し、ソースコードからriscv-gnu-toolchainをビルドする。
-```bash
+```shell
 cd ~
 git clone --depth=1 https://github.com/riscv-collab/riscv-gnu-toolchain.git
 cd riscv-gnu-toolchain/
@@ -75,13 +75,13 @@ sudo make
 この本が書かれたのが2023年の8月頃なので、当時の安定リリースであるQEMUのv8.0系をソースコードからビルドし、インストールする。
 
 ビルドに必要なパッケージをインストールしておく。
-```bash
+```shell
 sudo apt install -y pkg-config ninja-build libglib2.0 libpixman-1-dev
 ```
 環境によっては、上記以外にも足りないパッケージがあるかもしれないので、ビルド実行後にエラーが出たら適宜インストールしてから再実行する。
 
 以下のコマンドを実行する。
-```bash
+```shell
 mkdir ~/qemu && cd ~/qemu
 git clone --depth=1 --branch stable-8.0 https://github.com/qemu/qemu.git
 sudo mkdir /opt/qemu-system-riscv32
@@ -92,14 +92,14 @@ sudo make install
 ビルドが完了すると、上の`--prefix`で指定したパスに`qemu-system-riscv32`という実行バイナリが生成されているはず。そのディレクトリに対してPATHを通す。
 
 すなわち`.bashrc`に以下を追加する。
-```bash
+```shell
 export PATH="$PATH:/opt/qemu-system-riscv32/bin"
 ```
 
 
 ### 動作確認
 本の記述通りに`run.sh`を記述し、実行した。
-```bash
+```shell
 ❯ ./run.sh 
 + QEMU=qemu-system-riscv32
 + qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot
@@ -156,7 +156,7 @@ Boot HART MEDELEG         : 0x00f0b509
 
 ### ldがriscv32向けのelfを吐けない
 本の[5.ブート](https://operating-system-in-1000-lines.vercel.app/ja/boot)の通りに`kernel.c`, `kernel.ld`を作成し、`run.sh`でビルドしようとすると、以下のエラーが出た
-```bash
+```shell
 ❯ ./run.sh
 + QEMU=qemu-system-riscv32
 + CC=clang

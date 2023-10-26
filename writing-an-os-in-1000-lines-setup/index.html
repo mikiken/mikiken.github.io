@@ -117,7 +117,7 @@ https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-envi
 </span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">❯ ./run.sh
+<pre class="chroma"><code class="language-shell" data-lang="shell">❯ ./run.sh
 + <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
 + qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot
 qemu-system-riscv32: Unable to load the RISC-V firmware <span class="s2">&#34;opensbi-riscv32-virt-fw_jump.bin&#34;</span>
@@ -158,8 +158,8 @@ qemu-system-riscv32: Unable to load the RISC-V firmware <span class="s2">&#34;op
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-fallback" data-lang="fallback">❯ ./run.sh
-+ QEMU=qemu-system-riscv32
+<pre class="chroma"><code class="language-shell" data-lang="shell">❯ ./run.sh
++ <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
 + qemu-system-riscv32 -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot
 
 
@@ -178,7 +178,7 @@ qemu-system-riscv32: Unable to load the RISC-V firmware <span class="s2">&#34;op
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">sudo apt-get remove --purge <span class="s2">&#34;qemu-*&#34;</span>
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo apt-get remove --purge <span class="s2">&#34;qemu-*&#34;</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="riscv-gnu-toolchainをソースコードからビルドする">riscv-gnu-toolchainをソースコードからビルドする</h3>
@@ -188,7 +188,7 @@ qemu-system-riscv32: Unable to load the RISC-V firmware <span class="s2">&#34;op
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">sudo apt install -y texinfo bison flex libgmp-dev
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo apt install -y texinfo bison flex libgmp-dev
 </code></pre></td></tr></table>
 </div>
 </div><p>環境によっては、上記以外にも足りないパッケージがあるかもしれないので、ビルド実行後にエラーが出たら適宜インストールしてから再実行する。</p>
@@ -202,7 +202,7 @@ qemu-system-riscv32: Unable to load the RISC-V firmware <span class="s2">&#34;op
 </span><span class="lnt">5
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">cd</span> ~
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">cd</span> ~
 git clone --depth<span class="o">=</span><span class="m">1</span> https://github.com/riscv-collab/riscv-gnu-toolchain.git
 <span class="nb">cd</span> riscv-gnu-toolchain/
 ./configure --prefix<span class="o">=</span>/opt/riscv32 --with-arch<span class="o">=</span>rv32i --with-abi<span class="o">=</span>ilp32
@@ -217,7 +217,7 @@ sudo make
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">sudo apt install -y pkg-config ninja-build libglib2.0 libpixman-1-dev
+<pre class="chroma"><code class="language-shell" data-lang="shell">sudo apt install -y pkg-config ninja-build libglib2.0 libpixman-1-dev
 </code></pre></td></tr></table>
 </div>
 </div><p>環境によっては、上記以外にも足りないパッケージがあるかもしれないので、ビルド実行後にエラーが出たら適宜インストールしてから再実行する。</p>
@@ -232,7 +232,7 @@ sudo make
 </span><span class="lnt">6
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">mkdir ~/qemu <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ~/qemu
+<pre class="chroma"><code class="language-shell" data-lang="shell">mkdir ~/qemu <span class="o">&amp;&amp;</span> <span class="nb">cd</span> ~/qemu
 git clone --depth<span class="o">=</span><span class="m">1</span> --branch stable-8.0 https://github.com/qemu/qemu.git
 sudo mkdir /opt/qemu-system-riscv32
 sudo ./configure --target-list<span class="o">=</span>riscv32-softmmu --prefix<span class="o">=</span>/opt/qemu-system-riscv32/
@@ -247,7 +247,7 @@ sudo make install
 <pre class="chroma"><code><span class="lnt">1
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$PATH</span><span class="s2">:/opt/qemu-system-riscv32/bin&#34;</span>
+<pre class="chroma"><code class="language-shell" data-lang="shell"><span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&#34;</span><span class="nv">$PATH</span><span class="s2">:/opt/qemu-system-riscv32/bin&#34;</span>
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="動作確認">動作確認</h3>
@@ -306,7 +306,7 @@ sudo make install
 </span><span class="lnt">50
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">❯ ./run.sh 
+<pre class="chroma"><code class="language-shell" data-lang="shell">❯ ./run.sh 
 + <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
 + qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot
 
@@ -373,7 +373,7 @@ Boot HART MEDELEG         : 0x00f0b509
 </span><span class="lnt">8
 </span></code></pre></td>
 <td class="lntd">
-<pre class="chroma"><code class="language-bash" data-lang="bash">❯ ./run.sh
+<pre class="chroma"><code class="language-shell" data-lang="shell">❯ ./run.sh
 + <span class="nv">QEMU</span><span class="o">=</span>qemu-system-riscv32
 + <span class="nv">CC</span><span class="o">=</span>clang
 + <span class="nv">CFLAGS</span><span class="o">=</span><span class="s1">&#39;-std=c11 -O2 -g3 -Wall -Wextra --target=riscv32 -ffreestanding -nostdlib&#39;</span>
