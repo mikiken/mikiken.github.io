@@ -7,10 +7,10 @@
             <atom:link href="https://mikiken.net/index.xml" rel="self" type="application/rss+xml" />
         <item>
     <title>&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ</title>
-    <link>https://mikiken.net/writing-an-os-in-1000-lines-setup/</link>
+    <link>https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/</link>
     <pubDate>Thu, 26 Oct 2023 17:49:53 &#43;0900</pubDate>
     <author>mikiken</author>
-    <guid>https://mikiken.net/writing-an-os-in-1000-lines-setup/</guid>
+    <guid>https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/</guid>
     <description><![CDATA[同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
  本の記述に従い環境構築をしてみた
  しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
