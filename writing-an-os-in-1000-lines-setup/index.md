@@ -3,12 +3,12 @@
 
 同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
 
-https://zenn.dev/mikiken/scraps/483401c1bef8a1
+{{<cardlink url="https://zenn.dev/mikiken/scraps/483401c1bef8a1">}}
 
 
 本の記述に従い環境構築をしてみた
 
-https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment
+{{<cardlink url="https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment">}}
 
 しかし、[5. ブート](https://operating-system-in-1000-lines.vercel.app/ja/boot)の説明通りに`run.sh`を記述し実行したところ、以下のようなエラーが出た
 ```shell
@@ -193,6 +193,6 @@ $QEMU -machine virt -bios default -nographic -serial mon:stdio --no-reboot -kern
 
 
 ### 参考にさせていただいたサイト
-https://qiita.com/ms5/items/74efa5d1ada4912b6a53
+{{<cardlink url="https://qiita.com/ms5/items/74efa5d1ada4912b6a53">}}
 
-https://blog.rogiken.org/blog/2023/04/06/32bit-risc-v-linux%E3%82%92%E4%BD%9C%E3%82%8Aqemu%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B/
+{{<cardlink url="https://blog.rogiken.org/blog/2023/04/06/32bit-risc-v-linux%E3%82%92%E4%BD%9C%E3%82%8Aqemu%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B/">}}

@@ -6,10 +6,8 @@
         <meta name="robots" content="noodp" />
         <title>&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ - mikiken.net</title><meta name="Description" content=""><meta property="og:title" content="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ" />
 <meta property="og:description" content="同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
-https://zenn.dev/mikiken/scraps/483401c1bef8a1
-本の記述に従い環境構築をしてみた
-https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment
-しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
+ 本の記述に従い環境構築をしてみた
+ しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
 1 2 3 4  ❯ ./run.sh &#43; QEMU=qemu-system-riscv32 &#43; qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
 そこで、run.shを以下のように変更した
 1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない
@@ -21,10 +19,8 @@ https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-envi
 <meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ"/>
 <meta name="twitter:description" content="同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
-https://zenn.dev/mikiken/scraps/483401c1bef8a1
-本の記述に従い環境構築をしてみた
-https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment
-しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
+ 本の記述に従い環境構築をしてみた
+ しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
 1 2 3 4  ❯ ./run.sh &#43; QEMU=qemu-system-riscv32 &#43; qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
 そこで、run.shを以下のように変更した
 1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない
@@ -42,7 +38,7 @@ https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-envi
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "https:\/\/mikiken.net\/writing-an-os-in-1000-lines-setup\/"
-        },"genre": "posts","wordcount":  622 ,
+        },"genre": "posts","wordcount":  618 ,
         "url": "https:\/\/mikiken.net\/writing-an-os-in-1000-lines-setup\/","datePublished": "2023-10-26T17:49:53+09:00","dateModified": "2023-10-26T17:49:53+09:00","publisher": {
             "@type": "Organization",
             "name": ""},"author": {
@@ -105,9 +101,11 @@ https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-envi
   </ul>
 </nav></div>
     </div><div class="content" id="content"><p>同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく</p>
-<p><a href="https://zenn.dev/mikiken/scraps/483401c1bef8a1">https://zenn.dev/mikiken/scraps/483401c1bef8a1</a></p>
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fzenn.dev%2fmikiken%2fscraps%2f483401c1bef8a1" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
 <p>本の記述に従い環境構築をしてみた</p>
-<p><a href="https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment">https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment</a></p>
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2foperating-system-in-1000-lines.vercel.app%2fja%2fsetting-up-development-environment" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
 <p>しかし、<a href="https://operating-system-in-1000-lines.vercel.app/ja/boot" target="_blank" rel="noopener noreffer ">5. ブート</a>の説明通りに<code>run.sh</code>を記述し実行したところ、以下のようなエラーが出た</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -429,8 +427,10 @@ clang: error: ld <span class="nb">command</span> failed with <span class="nb">ex
 </code></pre></td></tr></table>
 </div>
 </div><h3 id="参考にさせていただいたサイト">参考にさせていただいたサイト</h3>
-<p><a href="https://qiita.com/ms5/items/74efa5d1ada4912b6a53">https://qiita.com/ms5/items/74efa5d1ada4912b6a53</a></p>
-<p><a href="https://blog.rogiken.org/blog/2023/04/06/32bit-risc-v-linux%E3%82%92%E4%BD%9C%E3%82%8Aqemu%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B/">https://blog.rogiken.org/blog/2023/04/06/32bit-risc-v-linux%E3%82%92%E4%BD%9C%E3%82%8Aqemu%E3%81%A7%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8B/</a></p>
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fqiita.com%2fms5%2fitems%2f74efa5d1ada4912b6a53" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fblog.rogiken.org%2fblog%2f2023%2f04%2f06%2f32bit-risc-v-linux%25E3%2582%2592%25E4%25BD%259C%25E3%2582%258Aqemu%25E3%2581%25A7%25E5%25AE%259F%25E8%25A1%258C%25E3%2581%2599%25E3%2582%258B%2f" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
 </div><div class="post-footer" id="post-footer">
     <div class="post-info">
         <div class="post-info-line">
