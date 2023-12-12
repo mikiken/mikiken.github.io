@@ -6,6 +6,22 @@
         <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Sun, 20 Aug 2023 17:23:57 &#43;0900</lastBuildDate>
             <atom:link href="https://mikiken.net/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>「CPUの創りかた」のTD4をFPGAで実装してみた</title>
+    <link>https://mikiken.net/posts/td4-fpga/</link>
+    <pubDate>Wed, 13 Dec 2023 00:00:00 &#43;0900</pubDate>
+    <author>mikiken</author>
+    <guid>https://mikiken.net/posts/td4-fpga/</guid>
+    <description><![CDATA[この記事は CAMPHOR- Advent Calendar 2023 の13日目の記事です。
+はじめに 「CPUの創りかた」という本をご存知でしょうか？2003年に出版された本で、汎用ロジックIC(74シリーズ)を使って、簡単な4bitのCPUを作ります。本のタイトルから、デジタル回路の話が多そうだという印象を持つかもしれませんが、LED点灯回路の抵抗値の計算といった、基本的なアナログ回路の内容から丁寧に解説されている名著です。今年で発売から20年を迎えますが、未だに根強い人気を誇っており、現在では30刷以上重版されているようです。
+ 僕の通う大学では、3年生後期に、FPGAで何らかのデジタル回路を実装するという実験があります。そこで、この本の内容をFPGAで実装してみました。
+大学の実験で「CPUの創りかた」のTD4をFPGAで実装してみた pic.twitter.com/Oqk6r73JyZ
+&mdash; mikiken (@mikikeen) November 6, 2023  作ったもの 「CPUの創りかた」では、TD4という4bitのCPUを段階を分けて作っていきます。
+TD4の仕様をざっくり説明すると、
+ 命令長8bit (オペコード 4bit, オペランド 4bit) 演算用のレジスタ(4bit)が2つ  という感じです。
+実行できる命令としては、以下の12種類があります。
+ ADD A, Im ADD B, Im MOV A, Im MOV B, Im MOV A, B MOV B, A JMP Im JNC Im  キャリーフラグが0のとき、即値Imで指定されたアドレスにジャンプする   IN A  入力端子からデータを入力し、Aレジスタに代入する   IN B  入力端子からデータを入力し、Bレジスタに代入する   OUT B  Bレジスタの値を出力端子に出力する なお、OUT A命令は存在しない。   OUT Im  即値Imを出力端子に出力する    なお、リポジトリはこれです。]]></description>
+</item>
+<item>
     <title>&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ</title>
     <link>https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/</link>
     <pubDate>Thu, 26 Oct 2023 17:49:53 &#43;0900</pubDate>

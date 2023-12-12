@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>「CPUの創りかた」のTD4をFPGAで実装してみた - mikiken.net</title><meta name="Description" content=""><meta property="og:title" content="「CPUの創りかた」のTD4をFPGAで実装してみた" />
+<meta property="og:description" content="この記事は CAMPHOR- Advent Calendar 2023 の13日目の記事です。
+はじめに 「CPUの創りかた」という本をご存知でしょうか？2003年に出版された本で、汎用ロジックIC(74シリーズ)を使って、簡単な4bitのCPUを作ります。本のタイトルから、デジタル回路の話が多そうだという印象を持つかもしれませんが、LED点灯回路の抵抗値の計算といった、基本的なアナログ回路の内容から丁寧に解説されている名著です。今年で発売から20年を迎えますが、未だに根強い人気を誇っており、現在では30刷以上重版されているようです。
+ 僕の通う大学では、3年生後期に、FPGAで何らかのデジタル回路を実装するという実験があります。そこで、この本の内容をFPGAで実装してみました。
+大学の実験で「CPUの創りかた」のTD4をFPGAで実装してみた pic.twitter.com/Oqk6r73JyZ
+&mdash; mikiken (@mikikeen) November 6, 2023  作ったもの 「CPUの創りかた」では、TD4という4bitのCPUを段階を分けて作っていきます。
+TD4の仕様をざっくり説明すると、
+ 命令長8bit (オペコード 4bit, オペランド 4bit) 演算用のレジスタ(4bit)が2つ  という感じです。
+実行できる命令としては、以下の12種類があります。
+ ADD A, Im ADD B, Im MOV A, Im MOV B, Im MOV A, B MOV B, A JMP Im JNC Im  キャリーフラグが0のとき、即値Imで指定されたアドレスにジャンプする   IN A  入力端子からデータを入力し、Aレジスタに代入する   IN B  入力端子からデータを入力し、Bレジスタに代入する   OUT B  Bレジスタの値を出力端子に出力する なお、OUT A命令は存在しない。   OUT Im  即値Imを出力端子に出力する    なお、リポジトリはこれです。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://mikiken.net/posts/td4-fpga/" />
+<meta property="article:published_time" content="2023-12-13T00:00:00+09:00" />
+<meta property="article:modified_time" content="2023-12-13T00:00:00+09:00" /><meta property="og:site_name" content="mikiken.net" />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="「CPUの創りかた」のTD4をFPGAで実装してみた"/>
+<meta name="twitter:description" content="この記事は CAMPHOR- Advent Calendar 2023 の13日目の記事です。
+はじめに 「CPUの創りかた」という本をご存知でしょうか？2003年に出版された本で、汎用ロジックIC(74シリーズ)を使って、簡単な4bitのCPUを作ります。本のタイトルから、デジタル回路の話が多そうだという印象を持つかもしれませんが、LED点灯回路の抵抗値の計算といった、基本的なアナログ回路の内容から丁寧に解説されている名著です。今年で発売から20年を迎えますが、未だに根強い人気を誇っており、現在では30刷以上重版されているようです。
+ 僕の通う大学では、3年生後期に、FPGAで何らかのデジタル回路を実装するという実験があります。そこで、この本の内容をFPGAで実装してみました。
+大学の実験で「CPUの創りかた」のTD4をFPGAで実装してみた pic.twitter.com/Oqk6r73JyZ
+&mdash; mikiken (@mikikeen) November 6, 2023  作ったもの 「CPUの創りかた」では、TD4という4bitのCPUを段階を分けて作っていきます。
+TD4の仕様をざっくり説明すると、
+ 命令長8bit (オペコード 4bit, オペランド 4bit) 演算用のレジスタ(4bit)が2つ  という感じです。
+実行できる命令としては、以下の12種類があります。
+ ADD A, Im ADD B, Im MOV A, Im MOV B, Im MOV A, B MOV B, A JMP Im JNC Im  キャリーフラグが0のとき、即値Imで指定されたアドレスにジャンプする   IN A  入力端子からデータを入力し、Aレジスタに代入する   IN B  入力端子からデータを入力し、Bレジスタに代入する   OUT B  Bレジスタの値を出力端子に出力する なお、OUT A命令は存在しない。   OUT Im  即値Imを出力端子に出力する    なお、リポジトリはこれです。"/>
+<meta name="application-name" content="mikiken.net">
+<meta name="apple-mobile-web-app-title" content="mikiken.net"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="https://mikiken.net/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://mikiken.net/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://mikiken.net/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="https://mikiken.net/apple-touch-icon.png"><link rel="mask-icon" href="https://mikiken.net/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="https://mikiken.net/site.webmanifest"><link rel="canonical" href="https://mikiken.net/posts/td4-fpga/" /><link rel="prev" href="https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/" /><link rel="stylesheet" href="https://mikiken.net/css/style.min.1e4111fdfda08071a5be9556a54117d49809c2474a117e69ab99426007adf2cd.css" integrity="sha256-HkER/f2ggHGlvpVWpUEX1JgJwkdKEX5pq5lCYAet8s0="><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "「CPUの創りかた」のTD4をFPGAで実装してみた",
+        "inLanguage": "ja",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/mikiken.net\/posts\/td4-fpga\/"
+        },"genre": "posts","wordcount":  384 ,
+        "url": "https:\/\/mikiken.net\/posts\/td4-fpga\/","datePublished": "2023-12-13T00:00:00+09:00","dateModified": "2023-12-13T00:00:00+09:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "mikiken"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile"> Profile </a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts"> Posts </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile">Profile</a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts">Posts</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+    <h2 class="toc-title">Contents</h2>
+    <div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">「CPUの創りかた」のTD4をFPGAで実装してみた</h1><div class="post-meta">
+        <div class="post-meta-line"></div>
+        <div class="post-meta-line"><time datetime="2023-12-13">2023-12-13</time>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="">
+        <div class="details-summary toc-title">
+            <span>Contents</span>
+            <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#はじめに">はじめに</a></li>
+    <li><a href="#作ったもの">作ったもの</a></li>
+    <li><a href="#実装方法">実装方法</a></li>
+    <li><a href="#感想など">感想など</a></li>
+  </ul>
+</nav></div>
+    </div><div class="content" id="content"><p>この記事は <a href="https://advent.camph.net" target="_blank" rel="noopener noreffer ">CAMPHOR- Advent Calendar 2023</a> の13日目の記事です。</p>
+<h2 id="はじめに">はじめに</h2>
+<p>「CPUの創りかた」という本をご存知でしょうか？2003年に出版された本で、汎用ロジックIC(74シリーズ)を使って、簡単な4bitのCPUを作ります。本のタイトルから、デジタル回路の話が多そうだという印象を持つかもしれませんが、LED点灯回路の抵抗値の計算といった、基本的なアナログ回路の内容から丁寧に解説されている名著です。今年で発売から20年を迎えますが、未だに根強い人気を誇っており、現在では30刷以上重版されているようです。</p>
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fbook.mynavi.jp%2fec%2fproducts%2fdetail%2fid%3d22065" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
+<p>僕の通う大学では、3年生後期に、FPGAで何らかのデジタル回路を実装するという実験があります。そこで、この本の内容をFPGAで実装してみました。</p>
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">大学の実験で「CPUの創りかた」のTD4をFPGAで実装してみた <a href="https://t.co/Oqk6r73JyZ">pic.twitter.com/Oqk6r73JyZ</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1721556673981219065?ref_src=twsrc%5Etfw">November 6, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<h2 id="作ったもの">作ったもの</h2>
+<p>「CPUの創りかた」では、TD4という4bitのCPUを段階を分けて作っていきます。</p>
+<p>TD4の仕様をざっくり説明すると、</p>
+<ul>
+<li>命令長8bit (オペコード 4bit, オペランド 4bit)</li>
+<li>演算用のレジスタ(4bit)が2つ</li>
+</ul>
+<p>という感じです。</p>
+<p>実行できる命令としては、以下の12種類があります。</p>
+<ul>
+<li><code>ADD A, Im</code></li>
+<li><code>ADD B, Im</code></li>
+<li><code>MOV A, Im</code></li>
+<li><code>MOV B, Im</code></li>
+<li><code>MOV A, B</code></li>
+<li><code>MOV B, A</code></li>
+<li><code>JMP Im</code></li>
+<li><code>JNC Im</code>
+<ul>
+<li>キャリーフラグが0のとき、即値Imで指定されたアドレスにジャンプする</li>
+</ul>
+</li>
+<li><code>IN A</code>
+<ul>
+<li>入力端子からデータを入力し、Aレジスタに代入する</li>
+</ul>
+</li>
+<li><code>IN B</code>
+<ul>
+<li>入力端子からデータを入力し、Bレジスタに代入する</li>
+</ul>
+</li>
+<li><code>OUT B</code>
+<ul>
+<li>Bレジスタの値を出力端子に出力する なお、<code>OUT A</code>命令は存在しない。</li>
+</ul>
+</li>
+<li><code>OUT Im</code>
+<ul>
+<li>即値Imを出力端子に出力する</li>
+</ul>
+</li>
+</ul>
+<br>
+<p>なお、リポジトリはこれです。</p>
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fmikiken%2ftd4" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
+<p>あと、学校の授業で成果発表したときのスライドを一応載せときます</p>
+<iframe class="speakerdeck-iframe" frameborder="0" src="https://speakerdeck.com/player/0a03e727a29747439945f771ad10c3af" title="簡単な4bitCPUの作成" allowfullscreen="true" style="border: 0px; background: padding-box padding-box rgba(0, 0, 0, 0.1); margin: 0px; padding: 0px; border-radius: 6px; box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 40px; width: 100%; height: auto; aspect-ratio: 560 / 315;" data-ratio="1.7777777777777777"></iframe>
+<h2 id="実装方法">実装方法</h2>
+<p>基本的には本に書いてある通りに実装しました。具体的には、</p>
+<ol>
+<li>レジスタ</li>
+<li>ALU</li>
+<li>プログラムカウンタ</li>
+<li>命令デコーダ</li>
+<li>ROM</li>
+</ol>
+<p>の順に実装しました。</p>
+<p>なお、実装に使った(実験で渡された)FPGAボードは、PowerMedusa MU500-RXです。
+三菱電機マイコン機器ソフトウエアが出しているFPGAボードで、AlteraのEP4CE30F23I7NっていうFPGAが載ってるらしい。</p>
+<p>ほぼ本に書いてある順で実装したんですが、ROMだけ実装方針に悩んだので最後に回しました。
+本だと8bitをDIPスイッチを16個並べてROMを表現しているんですが、今回使ったFPGAボードには8bitのDIPスイッチが2個しか搭載されていませんでした。</p>
+<p>そこで、Verilogを使って、ROMの各アドレスに対して決め打ちした命令を返す素子を書き、ROMを表現することにしました。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-verilog" data-lang="verilog"><span class="k">module</span> <span class="n">rom</span><span class="p">(</span>
+	<span class="k">input</span>  <span class="p">[</span><span class="mh">3</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">address</span><span class="p">,</span>
+	<span class="k">output</span> <span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">data</span>
+<span class="p">);</span>
+
+	<span class="k">function</span> <span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">select</span><span class="p">;</span>
+		<span class="k">input</span> <span class="p">[</span><span class="mh">3</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span>	<span class="n">address</span><span class="p">;</span>
+		<span class="k">case</span> <span class="p">(</span><span class="n">address</span><span class="p">)</span>
+			<span class="c1">//Ramen timer!
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0000</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b10110111</span><span class="p">;</span> <span class="c1">// OUT 0111
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0001</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b00000001</span><span class="p">;</span> <span class="c1">// ADD A,0001
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0010</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b11100001</span><span class="p">;</span> <span class="c1">// JNC 0001
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0011</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b00000001</span><span class="p">;</span> <span class="c1">// ADD A,0001
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0100</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b11100011</span><span class="p">;</span> <span class="c1">// JNC 0011
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0101</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b10110110</span><span class="p">;</span> <span class="c1">// OUT 0110
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0110</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b00000001</span><span class="p">;</span> <span class="c1">// ADD A,0001
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b0111</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b11100110</span><span class="p">;</span> <span class="c1">// JNC 0110
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1000</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b00000001</span><span class="p">;</span> <span class="c1">// ADD A,0001
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1001</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b11101000</span><span class="p">;</span> <span class="c1">// JNC 1000
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1010</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b10110000</span><span class="p">;</span> <span class="c1">// OUT 0000
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1011</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b10110100</span><span class="p">;</span> <span class="c1">// OUT 0100
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1100</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b00000001</span><span class="p">;</span> <span class="c1">// ADD 0001
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1101</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b11101010</span><span class="p">;</span> <span class="c1">// JNC 1010
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1110</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b10111000</span><span class="p">;</span> <span class="c1">// OUT 1000
+</span><span class="c1"></span>			<span class="mh">4</span><span class="mb">&#39;b1111</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="mb">&#39;b11111111</span><span class="p">;</span> <span class="c1">// JMP 1111
+</span><span class="c1"></span>			<span class="k">default</span><span class="o">:</span> <span class="n">select</span> <span class="o">=</span> <span class="mh">8</span><span class="p">&#39;</span><span class="n">bxxxxxxxx</span><span class="p">;</span>
+			
+			<span class="cm">/*
+</span><span class="cm">			//LED chikachika!
+</span><span class="cm">			4&#39;b0000: select = 8&#39;b10110011; // OUT 0011
+</span><span class="cm">			4&#39;b0001: select = 8&#39;b10110110; // OUT 0110
+</span><span class="cm">			4&#39;b0010: select = 8&#39;b10111100; // OUT 1100
+</span><span class="cm">			4&#39;b0011: select = 8&#39;b10111000; // OUT 1000
+</span><span class="cm">			4&#39;b0100: select = 8&#39;b10111000; // OUT 1000
+</span><span class="cm">			4&#39;b0101: select = 8&#39;b10111100; // OUT 1100
+</span><span class="cm">			4&#39;b0110: select = 8&#39;b10110110; // OUT 0110
+</span><span class="cm">			4&#39;b0111: select = 8&#39;b10110011; // OUT 0011
+</span><span class="cm">			4&#39;b1000: select = 8&#39;b10110001; // OUT 0001
+</span><span class="cm">			4&#39;b1001: select = 8&#39;b11110000; // JMP 0000
+</span><span class="cm">			4&#39;b1010: select = 8&#39;b00000000;
+</span><span class="cm">			4&#39;b1011: select = 8&#39;b00000000;
+</span><span class="cm">			4&#39;b1100: select = 8&#39;b00000000;
+</span><span class="cm">			4&#39;b1101: select = 8&#39;b00000000;
+</span><span class="cm">			4&#39;b1110: select = 8&#39;b00000000;
+</span><span class="cm">			4&#39;b1111: select = 8&#39;b00000000;
+</span><span class="cm">			default: select = 8&#39;bxxxxxxxx;
+</span><span class="cm">			*/</span>
+		<span class="k">endcase</span>
+	<span class="k">endfunction</span>
+	
+	<span class="k">assign</span> <span class="n">data</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span><span class="n">address</span><span class="p">);</span>
+
+<span class="k">endmodule</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>今回使ったFPGAボードはQuartusが使えるので、このVerilogのコードを回路図上のコンポーネントとしてexportし、ROMを実装しました。</p>
+<h2 id="感想など">感想など</h2>
+<p>ブラックボックスだと思っていたCPUについて、少しは理解が深まったと思います。今度はもう少し大規模なCPUをHDLで書いてみたいですね。</p>
+<p>どうでもいいことなんですが、気軽に最初のツイートをしたところ、思ったより反響があって驚きました。<del>やはり自作OS, 自作CPU, 自作言語は人類の三大欲求</del></p>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-12-13</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="https://mikiken.net/posts/td4-fpga/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="https://mikiken.net/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/" class="prev" rel="prev" title="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>"Writing an OS in 1000 lines"の環境構築をしたときのメモ</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://twitter.com/mikikeen" target="_blank">mikiken</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"twemoji":true};</script><script type="text/javascript" src="https://mikiken.net/js/theme.min.d5092a1e0b78bb72d42009815fb9c18a930ce42aeea87444fafc535e0506e833.js" integrity="sha256-1QkqHgt4u3LUIAmBX7nBipMM5CruqHRE+vxTXgUG6DM="></script></body>
+</html>
