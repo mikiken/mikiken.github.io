@@ -7,6 +7,7 @@
 
 
 本の記述に従い環境構築をしてみた
+※手元の環境はUbuntu 20.04.6 LTS (WSL2)
 
 {{<cardlink url="https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment">}}
 
