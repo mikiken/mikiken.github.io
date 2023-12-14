@@ -1,0 +1,3 @@
+[submodule "compiler_log"]
+	path = compiler_log
+	url = https://github.com/mikiken/compiler_log.git
