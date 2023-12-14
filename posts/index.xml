@@ -26,7 +26,8 @@ TD4の仕様をざっくり説明すると、
     <author>mikiken</author>
     <guid>https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/</guid>
     <description><![CDATA[同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
- 本の記述に従い環境構築をしてみた ※手元の環境はUbuntu 20.04.6 LTS (WSL2)
+ 本の記述に従い環境構築をしてみた
+※手元の環境はUbuntu 20.04.6 LTS (WSL2)
  しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
 1 2 3 4  ❯ ./run.sh + QEMU=qemu-system-riscv32 + qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
 そこで、run.shを以下のように変更した

@@ -6,7 +6,7 @@
 {{<cardlink url="https://zenn.dev/mikiken/scraps/483401c1bef8a1">}}
 
 
-本の記述に従い環境構築をしてみた
+本の記述に従い環境構築をしてみた<br>
 ※手元の環境はUbuntu 20.04.6 LTS (WSL2)
 
 {{<cardlink url="https://operating-system-in-1000-lines.vercel.app/ja/setting-up-development-environment">}}
