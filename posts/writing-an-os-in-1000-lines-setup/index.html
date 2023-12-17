@@ -25,6 +25,11 @@
 1 2 3 4  ❯ ./run.sh &#43; QEMU=qemu-system-riscv32 &#43; qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
 そこで、run.shを以下のように変更した
 1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない"/>
+
+<meta property="og:image" content="https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/ogp.png">
+<meta name="twitter:image" content="https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/ogp.png" />
+
+
 <meta name="application-name" content="mikiken.net">
 <meta name="apple-mobile-web-app-title" content="mikiken.net"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="https://mikiken.net/favicon.ico" />
 <link rel="icon" type="image/png" sizes="32x32" href="https://mikiken.net/favicon-32x32.png">
