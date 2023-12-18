@@ -26,8 +26,8 @@
 そこで、run.shを以下のように変更した
 1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない"/>
 
-<meta property="og:image" content="images/ogp/content/posts/writing-an-os-in-1000-lines-setup.png">
-<meta name="twitter:image" content="images/ogp/posts/writing-an-os-in-1000-lines-setup.png" />
+<meta property="og:image" content="https://mikiken.net/images/ogp/content/posts/writing-an-os-in-1000-lines-setup.png">
+<meta name="twitter:image" content="https://mikiken.net/images/ogp/posts/writing-an-os-in-1000-lines-setup.png" />
 
 
 <meta name="application-name" content="mikiken.net">
