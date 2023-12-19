@@ -16,18 +16,19 @@
 <meta property="og:url" content="https://mikiken.net/posts/writing-an-os-in-1000-lines-setup/" />
 <meta property="article:published_time" content="2023-10-26T17:49:53+09:00" />
 <meta property="article:modified_time" content="2023-10-26T17:49:53+09:00" /><meta property="og:site_name" content="mikiken.net" />
-<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ"/>
+
+<meta property="og:image" content="https://mikiken.net/images/ogp/content/posts/writing-an-os-in-1000-lines-setup.png">
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://mikiken.net/images/ogp/posts/writing-an-os-in-1000-lines-setup.png" />
+<meta name="twitter:title" content="&#34;Writing an OS in 1000 lines&#34;の環境構築をしたときのメモ" />
 <meta name="twitter:description" content="同じ内容をZennのスクラップにも書いたんですが、こっちにも一応書いとく
  本の記述に従い環境構築をしてみた
 ※手元の環境はUbuntu 20.04.6 LTS (WSL2)
  しかし、5. ブートの説明通りにrun.shを記述し実行したところ、以下のようなエラーが出た
 1 2 3 4  ❯ ./run.sh &#43; QEMU=qemu-system-riscv32 &#43; qemu-system-riscv32 -machine virt -bios default -nographic -serial mon:stdio --no-reboot qemu-system-riscv32: Unable to load the RISC-V firmware &#34;opensbi-riscv32-virt-fw_jump.bin&#34;   パッと見た感じ、QEMUが-bios defaultで呼び出すファームウェアが、本の執筆当時とは変わっていそう(?)
 そこで、run.shを以下のように変更した
-1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない"/>
-
-<meta property="og:image" content="https://mikiken.net/images/ogp/content/posts/writing-an-os-in-1000-lines-setup.png">
-<meta name="twitter:image" content="https://mikiken.net/images/ogp/posts/writing-an-os-in-1000-lines-setup.png" />
+1 2 3 4 5 6 7 8  #!/bin/bash set -xue # QEMUの実行バイナリへのパス QEMU=qemu-system-riscv32 # QEMUを起動 $QEMU -machine virt -bios opensbi-riscv32-generic-fw_dynamic.bin -nographic -serial mon:stdio --no-reboot   すると、エラー自体は出なくなったが、QEMUを起動しても何も表示されない" />
+<meta name="twitter:site" content="@mikikeen" />
 
 
 <meta name="application-name" content="mikiken.net">
