@@ -3,7 +3,22 @@
         <title>All Posts - mikiken.net</title>
         <link>https://mikiken.net/posts/</link>
         <description>All Posts | mikiken.net</description>
-        <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Wed, 13 Dec 2023 00:00:00 &#43;0900</lastBuildDate><atom:link href="https://mikiken.net/posts/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Thu, 21 Dec 2023 00:00:00 &#43;0900</lastBuildDate><atom:link href="https://mikiken.net/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>自作サイト用にOGP画像を自動生成するツールを作った</title>
+    <link>https://mikiken.net/posts/impl-ogp-image/</link>
+    <pubDate>Thu, 21 Dec 2023 00:00:00 &#43;0900</pubDate>
+    <author>mikiken</author>
+    <guid>https://mikiken.net/posts/impl-ogp-image/</guid>
+    <description><![CDATA[この記事は、CAMPHOR- Advent Calendar 2023 の21日目の記事です。
+はじめに TwitterとかSlackなどで、URLを貼り付けると、以下のように記事のサムネイルが表示されることがあると思います。
+SNS向けに記事のメタ情報を記述するプロトコルとしては、Open Graph protocol というものが広く使われています。
+今回は、このサイトにOGPに準拠した記事のサムネイルを自動生成するツール作ってみました。
+方針 自分しか使わないツールなので、とりあえず以下のような方針で進めることにしました。
+ サムネイルには、記事のタイトル, ユーザー名, アイコン, サイト名を表示する 記事の.mdファイルのパスを渡すと、Front Matterから記事タイトルを取得して、サムネイルを生成する Hugoと連携させる可能性を一応考え、Goで実装する SVGでサムネイルのテンプレートを用意しておき、そこに記事タイトルを埋め込み、PNGで出力する  実装してみる 雛形の用意 まずはサムネイルの雛形を用意します。適当にPowerPointで雛形を作成し、Inkscapeで調整すると以下のような感じになりました。適当に作ったらZennのパクリみたいになってしまった
+雛形のSVGファイルをテキストエディタで開き、いろいろ手直しを加えた結果、以下のようになりました。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40  &lt;?xml version=&#34;1.]]></description>
+</item>
+<item>
     <title>「CPUの創りかた」のTD4をFPGAで実装してみた</title>
     <link>https://mikiken.net/posts/td4-fpga/</link>
     <pubDate>Wed, 13 Dec 2023 00:00:00 &#43;0900</pubDate>
