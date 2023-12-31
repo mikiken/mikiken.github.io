@@ -3,7 +3,22 @@
         <title>All Posts - mikiken.net</title>
         <link>https://mikiken.net/posts/</link>
         <description>All Posts | mikiken.net</description>
-        <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Thu, 21 Dec 2023 00:00:00 &#43;0900</lastBuildDate><atom:link href="https://mikiken.net/posts/" rel="self" type="application/rss+xml" /><item>
+        <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Sun, 31 Dec 2023 00:00:00 &#43;0900</lastBuildDate><atom:link href="https://mikiken.net/posts/" rel="self" type="application/rss+xml" /><item>
+    <title>2023年を雑に振り返る</title>
+    <link>https://mikiken.net/posts/2023-looking-back/</link>
+    <pubDate>Sun, 31 Dec 2023 00:00:00 &#43;0900</pubDate>
+    <author>mikiken</author>
+    <guid>https://mikiken.net/posts/2023-looking-back/</guid>
+    <description><![CDATA[2023年何をしてたか、後から見返す用に雑に振り返ります。
+1月  自作Cコンパイラのスタックアライン崩れてるバグを倒した  最近自作Cコンパイラ触ってないなあ 早くセルフホストしたいね スタックアライメント崩れてるのが直って、ドーナツ動くようになった pic.twitter.com/BHBzOwpELp
+&mdash; mikiken (@mikikeen) January 2, 2023      2月  細々とした機能を自作コンパイラに足していたっぽい  配列の初期化式とか 初期化式があるときは配列の要素数を省略できるようにしたhttps://t.co/uFU4yGlrmP
+&mdash; mikiken (@mikikeen) February 16, 2023  文字列リテラルの初期化式を実装https://t.co/0Lzjm1FaNL
+&mdash; mikiken (@mikikeen) February 26, 2023      3月   セキュリティキャンプフォーラムに行った
+ セキュキャン修了生向けのイベント でした pic.twitter.com/oifxPjiMhc
+&mdash; mikiken (@mikikeen) March 11, 2023      CAMPHOR- の運営メンバーになった
+ CAMPHOR- 自体は、去年の12月くらいから行くようになった 居心地よくて何回か行ってたらぬるっと運営メンバーになってた    4月  自作Cコンパイラに多次元配列を実装 多次元配列を実装https://t.]]></description>
+</item>
+<item>
     <title>自作サイト用にOGP画像を自動生成するツールを作った</title>
     <link>https://mikiken.net/posts/impl-ogp-image/</link>
     <pubDate>Thu, 21 Dec 2023 00:00:00 &#43;0900</pubDate>

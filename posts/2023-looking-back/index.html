@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>2023年を雑に振り返る - mikiken.net</title><meta name="Description" content=""><meta property="og:title" content="2023年を雑に振り返る" />
+<meta property="og:description" content="2023年何をしてたか、後から見返す用に雑に振り返ります。
+1月  自作Cコンパイラのスタックアライン崩れてるバグを倒した  最近自作Cコンパイラ触ってないなあ 早くセルフホストしたいね スタックアライメント崩れてるのが直って、ドーナツ動くようになった pic.twitter.com/BHBzOwpELp
+&mdash; mikiken (@mikikeen) January 2, 2023      2月  細々とした機能を自作コンパイラに足していたっぽい  配列の初期化式とか 初期化式があるときは配列の要素数を省略できるようにしたhttps://t.co/uFU4yGlrmP
+&mdash; mikiken (@mikikeen) February 16, 2023  文字列リテラルの初期化式を実装https://t.co/0Lzjm1FaNL
+&mdash; mikiken (@mikikeen) February 26, 2023      3月   セキュリティキャンプフォーラムに行った
+ セキュキャン修了生向けのイベント でした pic.twitter.com/oifxPjiMhc
+&mdash; mikiken (@mikikeen) March 11, 2023      CAMPHOR- の運営メンバーになった
+ CAMPHOR- 自体は、去年の12月くらいから行くようになった 居心地よくて何回か行ってたらぬるっと運営メンバーになってた    4月  自作Cコンパイラに多次元配列を実装 多次元配列を実装https://t." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://mikiken.net/posts/2023-looking-back/" />
+<meta property="article:published_time" content="2023-12-31T00:00:00+09:00" />
+<meta property="article:modified_time" content="2023-12-31T00:00:00+09:00" /><meta property="og:site_name" content="mikiken.net" />
+
+<meta property="og:image" content="https://mikiken.net/images/ogp/content/posts/2023-looking-back.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://mikiken.net/images/ogp/posts/2023-looking-back.png">
+<meta name="twitter:title" content="2023年を雑に振り返る">
+<meta name="twitter:description" content="2023年何をしてたか、後から見返す用に雑に振り返ります。
+1月  自作Cコンパイラのスタックアライン崩れてるバグを倒した  最近自作Cコンパイラ触ってないなあ 早くセルフホストしたいね スタックアライメント崩れてるのが直って、ドーナツ動くようになった pic.twitter.com/BHBzOwpELp
+&mdash; mikiken (@mikikeen) January 2, 2023      2月  細々とした機能を自作コンパイラに足していたっぽい  配列の初期化式とか 初期化式があるときは配列の要素数を省略できるようにしたhttps://t.co/uFU4yGlrmP
+&mdash; mikiken (@mikikeen) February 16, 2023  文字列リテラルの初期化式を実装https://t.co/0Lzjm1FaNL
+&mdash; mikiken (@mikikeen) February 26, 2023      3月   セキュリティキャンプフォーラムに行った
+ セキュキャン修了生向けのイベント でした pic.twitter.com/oifxPjiMhc
+&mdash; mikiken (@mikikeen) March 11, 2023      CAMPHOR- の運営メンバーになった
+ CAMPHOR- 自体は、去年の12月くらいから行くようになった 居心地よくて何回か行ってたらぬるっと運営メンバーになってた    4月  自作Cコンパイラに多次元配列を実装 多次元配列を実装https://t.">
+<meta name="twitter:site" content="@mikikeen">
+
+
+<meta name="application-name" content="mikiken.net">
+<meta name="apple-mobile-web-app-title" content="mikiken.net"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="https://mikiken.net/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://mikiken.net/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://mikiken.net/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="https://mikiken.net/apple-touch-icon.png"><link rel="mask-icon" href="https://mikiken.net/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="https://mikiken.net/site.webmanifest"><link rel="canonical" href="https://mikiken.net/posts/2023-looking-back/" /><link rel="prev" href="https://mikiken.net/posts/impl-ogp-image/" /><link rel="stylesheet" href="https://mikiken.net/css/style.min.1e4111fdfda08071a5be9556a54117d49809c2474a117e69ab99426007adf2cd.css" integrity="sha256-HkER/f2ggHGlvpVWpUEX1JgJwkdKEX5pq5lCYAet8s0="><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "2023年を雑に振り返る",
+        "inLanguage": "ja",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/mikiken.net\/posts\/2023-looking-back\/"
+        },"genre": "posts","wordcount":  231 ,
+        "url": "https:\/\/mikiken.net\/posts\/2023-looking-back\/","datePublished": "2023-12-31T00:00:00+09:00","dateModified": "2023-12-31T00:00:00+09:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "mikiken"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile"> Profile </a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts"> Posts </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile">Profile</a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts">Posts</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+    <h2 class="toc-title">Contents</h2>
+    <div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">2023年を雑に振り返る</h1><div class="post-meta">
+        <div class="post-meta-line"></div>
+        <div class="post-meta-line"><time datetime="2023-12-31">2023-12-31</time>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="">
+        <div class="details-summary toc-title">
+            <span>Contents</span>
+            <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#1月">1月</a></li>
+        <li><a href="#2月">2月</a></li>
+        <li><a href="#3月">3月</a></li>
+        <li><a href="#4月">4月</a></li>
+        <li><a href="#5月">5月</a></li>
+        <li><a href="#6月">6月</a></li>
+        <li><a href="#7月">7月</a></li>
+        <li><a href="#8月">8月</a></li>
+        <li><a href="#9月">9月</a></li>
+        <li><a href="#10月">10月</a></li>
+        <li><a href="#11月">11月</a></li>
+        <li><a href="#12月">12月</a></li>
+        <li><a href="#感想">感想</a></li>
+        <li><a href="#来年何をしたいか">来年何をしたいか</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+    </div><div class="content" id="content"><p>2023年何をしてたか、後から見返す用に雑に振り返ります。</p>
+<h3 id="1月">1月</h3>
+<ul>
+<li>自作Cコンパイラのスタックアライン崩れてるバグを倒した
+<ul>
+<li>最近自作Cコンパイラ触ってないなあ</li>
+<li>早くセルフホストしたいね
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">スタックアライメント崩れてるのが直って、ドーナツ動くようになった <a href="https://t.co/BHBzOwpELp">pic.twitter.com/BHBzOwpELp</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1609897952960733186?ref_src=twsrc%5Etfw">January 2, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2月">2月</h3>
+<ul>
+<li>細々とした機能を自作コンパイラに足していたっぽい
+<ul>
+<li>配列の初期化式とか
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">初期化式があるときは配列の要素数を省略できるようにした<a href="https://t.co/uFU4yGlrmP">https://t.co/uFU4yGlrmP</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1626217257394384896?ref_src=twsrc%5Etfw">February 16, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">文字列リテラルの初期化式を実装<a href="https://t.co/0Lzjm1FaNL">https://t.co/0Lzjm1FaNL</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1629737831722795008?ref_src=twsrc%5Etfw">February 26, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="3月">3月</h3>
+<ul>
+<li>
+<p>セキュリティキャンプフォーラムに行った</p>
+<ul>
+<li>セキュキャン修了生向けのイベント
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">でした <a href="https://t.co/oifxPjiMhc">pic.twitter.com/oifxPjiMhc</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1634508807522091008?ref_src=twsrc%5Etfw">March 11, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+<li>
+<p><a href="https://camph.net" target="_blank" rel="noopener noreffer ">CAMPHOR-</a> の運営メンバーになった</p>
+<ul>
+<li>CAMPHOR- 自体は、去年の12月くらいから行くようになった</li>
+<li>居心地よくて何回か行ってたらぬるっと運営メンバーになってた</li>
+</ul>
+</li>
+</ul>
+<h3 id="4月">4月</h3>
+<ul>
+<li>自作Cコンパイラに多次元配列を実装
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">多次元配列を実装<a href="https://t.co/TJsDHtkLGj">https://t.co/TJsDHtkLGj</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1648993675735859200?ref_src=twsrc%5Etfw">April 20, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+<h3 id="5月">5月</h3>
+<ul>
+<li>ひたすら大学の課題に追われてた
+<ul>
+<li>オンライン時代のノリで授業取りまくったらキャパオーバーした</li>
+</ul>
+</li>
+</ul>
+<h3 id="6月">6月</h3>
+<ul>
+<li>
+<p>CAMPHOR- で<a href="https://camphor.connpass.com/event/284131/" target="_blank" rel="noopener noreffer ">植山類さんのイベント</a>に参加した
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">植山さんの講演よかったなぁ<br>特に、自作Cコンパイラ書いててモヤッと感のあったところの話が聞けて(ある程度)スッキリした<br>(PLT/GOTって何?ってなってた)<a href="https://twitter.com/hashtag/camphor_low_layer?src=hash&amp;ref_src=twsrc%5Etfw">#camphor_low_layer</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1667526684583804929?ref_src=twsrc%5Etfw">June 10, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+<li>
+<p>自作Cコンパイラが壊れた図
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">今日も一日 <a href="https://t.co/8cnjKeDQDv">pic.twitter.com/8cnjKeDQDv</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1668590942226649088?ref_src=twsrc%5Etfw">June 13, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+<li>
+<p>ネストした型の構文解析を実装した
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">ネストした型がパースできるようになった<a href="https://t.co/uMNRcYAFpn">https://t.co/uMNRcYAFpn</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1671750127374188544?ref_src=twsrc%5Etfw">June 22, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+</ul>
+<h3 id="7月">7月</h3>
+<ul>
+<li>
+<p>Twitterが壊れかけてたらしい
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">万一に備えTwitterの過去ツイートをエクスポートした</p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1675540884312690688?ref_src=twsrc%5Etfw">July 2, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+<li>
+<p>パソコンのキーが壊れた
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">Ctrlキーなし生活を、開始 <a href="https://t.co/tuACDerwXB">pic.twitter.com/tuACDerwXB</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1679166597347545089?ref_src=twsrc%5Etfw">July 12, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+</ul>
+<h3 id="8月">8月</h3>
+<ul>
+<li>
+<p>このサイトをつくった</p>
+</li>
+<li>
+<p>スマートリモコンつくってた
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">Slackからリモコン操作ができるようになった <a href="https://t.co/6wJoxmRqBZ">pic.twitter.com/6wJoxmRqBZ</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1688586593463123969?ref_src=twsrc%5Etfw">August 7, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+<li>
+<p>KLab Expert Camp</p>
+<ul>
+<li>TCP/IPのプロトコルスタックをCで書くという(一応)インターン</li>
+<li>ネットワーク何もわからんかったので、
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">TCPのパケットを送れるようになった<a href="https://twitter.com/hashtag/KLabExpertCamp?src=hash&amp;ref_src=twsrc%5Etfw">#KLabExpertCamp</a> <a href="https://t.co/cWx7qBQABk">pic.twitter.com/cWx7qBQABk</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1696761541775986813?ref_src=twsrc%5Etfw">August 30, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="9月">9月</h3>
+<ul>
+<li>
+<p>前期の科目の大量落単が発覚😇</p>
+</li>
+<li>
+<p>Turingのインターン</p>
+<ul>
+<li>実務型のインターンは初めてだったので、本当にいい経験をさせてもらえた
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">今日からTuringでサマーインターンに参加させてもらってる <a href="https://t.co/mvXhyn8boS">pic.twitter.com/mvXhyn8boS</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1701224640369279427?ref_src=twsrc%5Etfw">September 11, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+<li>
+<p>スマートリモコンつくってた2
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">温度とかのパラメータから信号を生成して、エアコンが制御できるようになった <a href="https://t.co/T73BzG2GAO">pic.twitter.com/T73BzG2GAO</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1700340819583193182?ref_src=twsrc%5Etfw">September 9, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">ラズパイでリモコン操作するやつを基板にした、いい感じ <a href="https://t.co/cqixu83n9a">pic.twitter.com/cqixu83n9a</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1707810093440577627?ref_src=twsrc%5Etfw">September 29, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</p>
+</li>
+</ul>
+<h3 id="10月">10月</h3>
+<ul>
+<li>
+<p>情報科学若手の会</p>
+<ul>
+<li>(なぜか)来年は幹事をさせていただくことになったので頑張りたい</li>
+<li>次行くときは何かしら発表できるようになりたいなあ
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">めちゃくちゃ勉強になった👀<br>次来るときは、何か発表できるようになりたい<br>(↓は交流イベントでもらった景品)<a href="https://twitter.com/hashtag/wakate2023?src=hash&amp;ref_src=twsrc%5Etfw">#wakate2023</a> <a href="https://t.co/kB5ol66YG8">pic.twitter.com/kB5ol66YG8</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1711200185379078304?ref_src=twsrc%5Etfw">October 9, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+<li>
+<p>セキュリティミニキャンプ徳島に参加した</p>
+<ul>
+<li>clang-query 初めて使った
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">着弾 <a href="https://t.co/4Z2RB75BnC">pic.twitter.com/4Z2RB75BnC</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1712973598888272307?ref_src=twsrc%5Etfw">October 13, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+<li>
+<p>研究室に仮配属された</p>
+<ul>
+<li>集積回路の論理診断とかFPGAとかやってる研究室</li>
+</ul>
+</li>
+</ul>
+<h3 id="11月">11月</h3>
+<ul>
+<li>
+<p>鴨川ハッカソン</p>
+<ul>
+<li>鴨川デルタにStarlinkとポータブル電源を設置して屋外でハッカソンをする</li>
+<li>ぶっ飛んだイベントで滅茶苦茶楽しかった
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr"><a href="https://twitter.com/hashtag/%E9%B4%A8%E5%B7%9D%E3%83%8F%E3%83%83%E3%82%AB%E3%82%BD%E3%83%B3?src=hash&amp;ref_src=twsrc%5Etfw">#鴨川ハッカソン</a> 無事に2日間終了しました！<br>優秀賞はチーム Do&#39;er (<a href="https://twitter.com/du_doer?ref_src=twsrc%5Etfw">@du_doer</a>) とチーム全財産6,478円でした！<br>前例のない斬新なイベントでしたが、参加者の皆さまに楽しんでいただけたようで光栄です😆<br>参加してくださった方々、ご協力いただいた STORES 株式会社の皆さま、ありがとうございました！ <a href="https://t.co/nV20Kg2I9Y">pic.twitter.com/nV20Kg2I9Y</a></p>&mdash; CAMPHOR- (@camphor_kyoto) <a href="https://twitter.com/camphor_kyoto/status/1721146948680585479?ref_src=twsrc%5Etfw">November 5, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+<li>
+<p>TD4をFPGAに実装</p>
+<ul>
+<li>思ったより反響があって驚いた
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fmikiken.net%2fposts%2ftd4-fpga%2f" width="300" height="150" frameborder="0" scrolling="no">
+</iframe>
+<blockquote class="twitter-tweet" data-dnt="true"><p lang="ja" dir="ltr">大学の実験で「CPUの創りかた」のTD4をFPGAで実装してみた <a href="https://t.co/Oqk6r73JyZ">pic.twitter.com/Oqk6r73JyZ</a></p>&mdash; mikiken (@mikikeen) <a href="https://twitter.com/mikikeen/status/1721556673981219065?ref_src=twsrc%5Etfw">November 6, 2023</a></blockquote>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="12月">12月</h3>
+<ul>
+<li>
+<p>インターン報告大会
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fblog.camph.net%2fnews%2fintern-report-2023%2f" width="300" height="150" frameborder="0" scrolling="no">
+</iframe></p>
+</li>
+<li>
+<p><a href="https://advent.camph.net" target="_blank" rel="noopener noreffer ">Advent Calendar</a>の記事を量産してた</p>
+</li>
+<li>
+<p>1000行OS自作本で自作OSに入門してた
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fmikiken%2fWriting-an-OS-in-1000-lines" width="300" height="150" frameborder="0" scrolling="no">
+</iframe></p>
+</li>
+</ul>
+<h3 id="感想">感想</h3>
+<p>今年の前半は結構自作Cコンパイラをやってたっぽい。夏くらいは、スマートリモコンとかインターンとかで、ハードウェア寄りのことをやってた。後半は、このサイトを作ったり、CAMPHOR- で動かしてるサービスを少し触ったりするようになり、結構幅広いレイヤの技術に触れられて楽しかったです。
+あと、夏休みにインターンを経験できたのは、かなり有意義だったと思います。</p>
+<h3 id="来年何をしたいか">来年何をしたいか</h3>
+<p>やってみたいことの粒度がかなりバラバラですが、</p>
+<ul>
+<li>自作CPU</li>
+<li>KiCadで基板作ってみたい</li>
+<li>SecHackとか未踏とか、規模大きめのプログラムを長期で作るやつをやってみたい</li>
+<li><strong>院試に通る</strong></li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2023-12-31</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="https://mikiken.net/posts/2023-looking-back/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="https://mikiken.net/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="https://mikiken.net/posts/impl-ogp-image/" class="prev" rel="prev" title="自作サイト用にOGP画像を自動生成するツールを作った"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>自作サイト用にOGP画像を自動生成するツールを作った</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://twitter.com/mikikeen" target="_blank">mikiken</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"twemoji":true};</script><script type="text/javascript" src="https://mikiken.net/js/theme.min.d5092a1e0b78bb72d42009815fb9c18a930ce42aeea87444fafc535e0506e833.js" integrity="sha256-1QkqHgt4u3LUIAmBX7nBipMM5CruqHRE+vxTXgUG6DM="></script></body>
+</html>
