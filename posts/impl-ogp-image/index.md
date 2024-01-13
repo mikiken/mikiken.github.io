@@ -157,9 +157,7 @@ Hugo側でも、OGPやTwitter Cardの設定の雛形は用意されており、`
 {{ if .Params.autoGenOgpImg }}
 <meta property="og:image" content="{{ .Site.BaseURL }}images/ogp/content/{{.File.Dir}}{{.File.BaseFileName}}.png">
 <meta name="twitter:card" content="summary_large_image">
-<!--
-<meta name="twitter:image" content="{{ .Site.BaseURL }}images/ogp/{{.File.Dir}}{{.File.BaseFileName}}.png">
--->
+<!--<meta name="twitter:image" content="{{ .Site.BaseURL }}images/ogp/{{.File.Dir}}{{.File.BaseFileName}}.png">-->
 {{- else -}}
 <meta name="twitter:card" content="summary">
 {{- end -}}
@@ -190,6 +188,7 @@ Hugo側でも、OGPやTwitter Cardの設定の雛形は用意されており、`
 ```
 
 ~~しかし書き方をミスってるっぽく、現状うまくTwitter Cardにサムネイルが表示されない~~
+
 (追記)
 `meta property="og:image"`と `meta name="twitter:card"`を併記しているとTwitterでOGP画像が出ない場合があるらしく、
 `meta name="twitter:card"`を消してみたら、TwitterでもOGP画像が表示されるようになった
@@ -210,4 +209,3 @@ git add -N . && git diff --name-only | grep \.md$ | xargs ogp-img-generator <雛
 ## 今後の課題など
 - 上の処理をCIでやるようにしたい
     - Goで実装したので、`go install`するだけで実行バイナリが生成でき、割とやりやすそう
-- Twitter Cardが上手く出ないのを直す
