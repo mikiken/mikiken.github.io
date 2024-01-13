@@ -45,7 +45,7 @@ SNS向けに記事のメタ情報を記述するプロトコルとしては、Op
         "mainEntityOfPage": {
             "@type": "WebPage",
             "@id": "https:\/\/mikiken.net\/posts\/impl-ogp-image\/"
-        },"genre": "posts","wordcount":  619 ,
+        },"genre": "posts","wordcount":  630 ,
         "url": "https:\/\/mikiken.net\/posts\/impl-ogp-image\/","datePublished": "2023-12-21T00:00:00+09:00","dateModified": "2023-12-21T00:00:00+09:00","publisher": {
             "@type": "Organization",
             "name": ""},"author": {
@@ -390,6 +390,8 @@ SNS向けに記事のメタ情報を記述するプロトコルとしては、Op
 </span><span class="lnt">31
 </span><span class="lnt">32
 </span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
 </span></code></pre></td>
 <td class="lntd">
 <pre class="chroma"><code class="language-HTML" data-lang="HTML">{{- template &#34;_internal/opengraph.html&#34; . -}}
@@ -397,7 +399,9 @@ SNS向けに記事のメタ情報を記述するプロトコルとしては、Op
 {{ if .Params.autoGenOgpImg }}
 <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">property</span><span class="o">=</span><span class="s">&#34;og:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Site.BaseURL }}images/ogp/content/{{.File.Dir}}{{.File.BaseFileName}}.png&#34;</span><span class="p">&gt;</span>
 <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:card&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;summary_large_image&#34;</span><span class="p">&gt;</span>
-<span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:image&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;{{ .Site.BaseURL }}images/ogp/{{.File.Dir}}{{.File.BaseFileName}}.png&#34;</span><span class="p">&gt;</span>
+<span class="c">&lt;!--
+</span><span class="c">&lt;meta name=&#34;twitter:image&#34; content=&#34;{{ .Site.BaseURL }}images/ogp/{{.File.Dir}}{{.File.BaseFileName}}.png&#34;&gt;
+</span><span class="c">--&gt;</span>
 {{- else -}}
 <span class="p">&lt;</span><span class="nt">meta</span> <span class="na">name</span><span class="o">=</span><span class="s">&#34;twitter:card&#34;</span> <span class="na">content</span><span class="o">=</span><span class="s">&#34;summary&#34;</span><span class="p">&gt;</span>
 {{- end -}}
@@ -427,7 +431,10 @@ SNS向けに記事のメタ情報を記述するプロトコルとしては、Op
 {{- end }}
 </code></pre></td></tr></table>
 </div>
-</div><p><del>しかし書き方をミスってるっぽく、現状うまくTwitter Cardにサムネイルが表示されない</del></p>
+</div><p><del>しかし書き方をミスってるっぽく、現状うまくTwitter Cardにサムネイルが表示されない</del>
+(追記)
+<code>meta property=&quot;og:image&quot;</code>と <code>meta name=&quot;twitter:card&quot;</code>を併記しているとTwitterでOGP画像が出ない場合があるらしく、
+<code>meta name=&quot;twitter:card&quot;</code>を消してみたら、TwitterでもOGP画像が表示されるようになった</p>
 <h2 id="使い方">使い方</h2>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -484,7 +491,7 @@ SNS向けに記事のメタ情報を記述するプロトコルとしては、Op
 </div>
 </article></div>
             </main><footer class="footer">
-        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://twitter.com/mikikeen" target="_blank">mikiken</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023 - 2024</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://twitter.com/mikikeen" target="_blank">mikiken</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
         </div>
     </footer></div>
 
