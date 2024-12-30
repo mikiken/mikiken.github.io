@@ -2,7 +2,8 @@
     xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     ><url>
-            <loc>https://mikiken.net/posts/</loc><lastmod>2024-05-15T23:43:52&#43;09:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+            <loc>https://mikiken.net/posts/2024-looking-back/</loc><lastmod>2024-12-31T02:34:36&#43;09:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+            <loc>https://mikiken.net/posts/</loc><lastmod>2024-12-31T02:34:36&#43;09:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
             <loc>https://mikiken.net/posts/bell-palsy/</loc><lastmod>2024-05-15T23:43:52&#43;09:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://mikiken.net/posts/lifegame-indicator/</loc><lastmod>2024-02-14T17:53:56&#43;09:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
             <loc>https://mikiken.net/posts/2023-looking-back/</loc><lastmod>2023-12-31T00:00:00&#43;09:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>

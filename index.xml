@@ -6,6 +6,21 @@
         <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Sun, 20 Aug 2023 17:23:57 &#43;0900</lastBuildDate>
             <atom:link href="https://mikiken.net/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>2024年を雑に振り返る</title>
+    <link>https://mikiken.net/posts/2024-looking-back/</link>
+    <pubDate>Tue, 31 Dec 2024 02:34:36 &#43;0900</pubDate>
+    <author>mikiken</author>
+    <guid>https://mikiken.net/posts/2024-looking-back/</guid>
+    <description><![CDATA[去年と同様、今年何をしてたかをざっくり振り返ります。
+ 1月   研究室に(仮)配属されてゼミ発表の準備に気を取られていたら、某授業の成績に占めるウエイトの大きい課題を吹き飛ばして絶望するなどしていた (試験頑張ってなんとか単位は確保した) 忄青幸𠬝亻云辶关 のレポート出し忘れてることに気づき、顔無くなった
+&mdash; mikiken (@mikikeen) January 18, 2024    学校の実験で、ライフゲームをマトリクスLEDに表示する謎デバイスを作っていた  大学の実験でライフゲームをマトリクスLEDに表示するやつ作った pic.twitter.com/61hdEif0HU
+&mdash; mikiken (@mikikeen) January 29, 2024   アホの量の配線と格闘していた模様 配線の量エグい(これで半分) pic.twitter.com/ogGYMX7lLZ
+&mdash; mikiken (@mikikeen) January 23, 2024      オシロスコープを買った my new gear...!!! pic.twitter.com/za04qEYoNs
+&mdash; mikiken (@mikikeen) January 31, 2024    2月  RISC-V CPU自作本をやったりしていた  パイプラインの実装までやって、Tang Primerという中華FPGAへの実装を試みたところ論理合成がうまくいかなかった様子 FIRRTLが吐いたVerilogを論理合成ツールに突っ込んだらSyntax Error出てて厳しい
+(bindが使える処理系があまりないようなので、若干書き換える必要があるっぽいが、Verilog力が低すぎて何も分からない😇) pic.twitter.com/du9wk6u08I
+&mdash; mikiken (@mikikeen) February 22, 2024      3月  情報科学若手の会 春の陣に参加していた  何も発表できず… 情報科学若手の会 春の陣 #wakate2024s を来週日曜日（3/10）に開催します！！]]></description>
+</item>
+<item>
     <title>ベル麻痺で顔の左半分が動かなくなったので症状の経過をメモする</title>
     <link>https://mikiken.net/posts/bell-palsy/</link>
     <pubDate>Wed, 15 May 2024 23:43:52 &#43;0900</pubDate>
