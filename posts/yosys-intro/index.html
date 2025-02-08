@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="robots" content="noodp" />
+        <title>Yosysを触ってみる - mikiken.net</title><meta name="Description" content=""><meta property="og:title" content="Yosysを触ってみる" />
+<meta property="og:description" content="卒業研究で、OSSの論理合成ツールであるYosysを少し触ったので、そのときに書いたメモを放流
+(基本的に他の人が読むことを想定して書いてないので、内容はかなり適当)
+Yosysのドキュメントを読んでみる チュートリアルなどドキュメントは、この辺にまとまってるっぽい 
+合成を試す (Synthesis starter) Synthesis starter - YosysHQ Yosys 0.41-dev documentation
+ このページでは、パッケージ化された iCE40 FPGA 合成スクリプト synth_ice40 のウォークスルーをガイドします。簡単なデザインを各ステップを通して、呼び出されるコマンドと、それらがデザインに与える影響について見ていきます。synth_ice40 は iCE40 プラットフォーム固有のものですが、これから説明する操作のほとんどは、FPGA 合成スクリプトの大部分で共通です。したがって、本書は、実際に使用されるアーキテクチャに関係なく、Yosysにおける合成がどのように実行されるかについて、基礎的な理解を深めるのに役立ちます。
+ サンプルの回路 (Demo design)  こういうVerilogのコードで試すらしい 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71  // address generator/counter module addr_gen #( parameter MAX_DATA=256, localparam AWIDTH = $clog2(MAX_DATA) ) ( input en, clk, rst, output reg [AWIDTH-1:0] addr ); initial addr &lt;= 0; // async reset  // increment address when enabled  always @(posedge clk or posedge rst) if (rst) addr &lt;= 0; else if (en) begin if (addr == MAX_DATA-1) addr &lt;= 0; else addr &lt;= addr &#43; 1; end endmodule //addr_gen  // Define our top level fifo entity module fifo #( parameter MAX_DATA=256, localparam AWIDTH = $clog2(MAX_DATA) ) ( input wen, ren, clk, rst, input [7:0] wdata, output reg [7:0] rdata, output reg [AWIDTH:0] count ); // fifo storage  // sync read before write  wire [AWIDTH-1:0] waddr, raddr; reg [7:0] data [MAX_DATA-1:0]; always @(posedge clk) begin if (wen) data[waddr] &lt;= wdata; rdata &lt;= data[raddr]; end // storage  // addr_gen for both write and read addresses  addr_gen #(." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://mikiken.net/posts/yosys-intro/" />
+<meta property="article:published_time" content="2025-02-09T00:15:22+09:00" />
+<meta property="article:modified_time" content="2025-02-09T00:15:22+09:00" /><meta property="og:site_name" content="mikiken.net" />
+
+<meta property="og:image" content="https://mikiken.net/posts/yosys-intro/ogp.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Yosysを触ってみる">
+<meta name="twitter:description" content="卒業研究で、OSSの論理合成ツールであるYosysを少し触ったので、そのときに書いたメモを放流
+(基本的に他の人が読むことを想定して書いてないので、内容はかなり適当)
+Yosysのドキュメントを読んでみる チュートリアルなどドキュメントは、この辺にまとまってるっぽい 
+合成を試す (Synthesis starter) Synthesis starter - YosysHQ Yosys 0.41-dev documentation
+ このページでは、パッケージ化された iCE40 FPGA 合成スクリプト synth_ice40 のウォークスルーをガイドします。簡単なデザインを各ステップを通して、呼び出されるコマンドと、それらがデザインに与える影響について見ていきます。synth_ice40 は iCE40 プラットフォーム固有のものですが、これから説明する操作のほとんどは、FPGA 合成スクリプトの大部分で共通です。したがって、本書は、実際に使用されるアーキテクチャに関係なく、Yosysにおける合成がどのように実行されるかについて、基礎的な理解を深めるのに役立ちます。
+ サンプルの回路 (Demo design)  こういうVerilogのコードで試すらしい 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71  // address generator/counter module addr_gen #( parameter MAX_DATA=256, localparam AWIDTH = $clog2(MAX_DATA) ) ( input en, clk, rst, output reg [AWIDTH-1:0] addr ); initial addr &lt;= 0; // async reset  // increment address when enabled  always @(posedge clk or posedge rst) if (rst) addr &lt;= 0; else if (en) begin if (addr == MAX_DATA-1) addr &lt;= 0; else addr &lt;= addr &#43; 1; end endmodule //addr_gen  // Define our top level fifo entity module fifo #( parameter MAX_DATA=256, localparam AWIDTH = $clog2(MAX_DATA) ) ( input wen, ren, clk, rst, input [7:0] wdata, output reg [7:0] rdata, output reg [AWIDTH:0] count ); // fifo storage  // sync read before write  wire [AWIDTH-1:0] waddr, raddr; reg [7:0] data [MAX_DATA-1:0]; always @(posedge clk) begin if (wen) data[waddr] &lt;= wdata; rdata &lt;= data[raddr]; end // storage  // addr_gen for both write and read addresses  addr_gen #(.">
+<meta name="twitter:site" content="@mikikeen">
+
+
+<meta name="application-name" content="mikiken.net">
+<meta name="apple-mobile-web-app-title" content="mikiken.net"><meta name="theme-color" content="#ffffff"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="https://mikiken.net/favicon.ico" />
+<link rel="icon" type="image/png" sizes="32x32" href="https://mikiken.net/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://mikiken.net/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="https://mikiken.net/apple-touch-icon.png"><link rel="mask-icon" href="https://mikiken.net/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="https://mikiken.net/site.webmanifest"><link rel="canonical" href="https://mikiken.net/posts/yosys-intro/" /><link rel="prev" href="https://mikiken.net/posts/2024-looking-back/" /><link rel="stylesheet" href="https://mikiken.net/css/style.min.1e4111fdfda08071a5be9556a54117d49809c2474a117e69ab99426007adf2cd.css" integrity="sha256-HkER/f2ggHGlvpVWpUEX1JgJwkdKEX5pq5lCYAet8s0="><link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css"></noscript><script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "headline": "Yosysを触ってみる",
+        "inLanguage": "ja",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https:\/\/mikiken.net\/posts\/yosys-intro\/"
+        },"genre": "posts","wordcount":  1158 ,
+        "url": "https:\/\/mikiken.net\/posts\/yosys-intro\/","datePublished": "2025-02-09T00:15:22+09:00","dateModified": "2025-02-09T00:15:22+09:00","publisher": {
+            "@type": "Organization",
+            "name": ""},"author": {
+                "@type": "Person",
+                "name": "mikiken"
+            },"description": ""
+    }
+    </script></head>
+    <body data-header-desktop="fixed" data-header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script>
+
+        <div id="mask"></div><div class="wrapper"><header class="desktop" id="header-desktop">
+    <div class="header-wrapper">
+        <div class="header-title">
+            <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+        </div>
+        <div class="menu">
+            <div class="menu-inner"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile"> Profile </a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts"> Posts </a><span class="menu-item delimiter"></span><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                    <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+                </a></div>
+        </div>
+    </div>
+</header><header class="mobile" id="header-mobile">
+    <div class="header-container">
+        <div class="header-wrapper">
+            <div class="header-title">
+                <a href="https://mikiken.net/" title="mikiken.net">mikiken.net</a>
+            </div>
+            <div class="menu-toggle" id="menu-toggle-mobile">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="menu" id="menu-mobile"><a class="menu-item" href="https://mikiken.net/profile/" title="Profile">Profile</a><a class="menu-item" href="https://mikiken.net/posts/" title="Posts">Posts</a><a href="javascript:void(0);" class="menu-item theme-switch" title="Switch Theme">
+                <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a></div>
+    </div>
+</header><main class="main">
+                <div class="container"><div class="toc" id="toc-auto">
+    <h2 class="toc-title">Contents</h2>
+    <div class="toc-content" id="toc-content-auto"></div>
+</div><article class="page single"><h1 class="single-title animate__animated animate__flipInX">Yosysを触ってみる</h1><div class="post-meta">
+        <div class="post-meta-line"></div>
+        <div class="post-meta-line"><time datetime="2025-02-09">2025-02-09</time>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="">
+        <div class="details-summary toc-title">
+            <span>Contents</span>
+            <span><i class="details-icon fas fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#yosysのドキュメントを読んでみる">Yosysのドキュメントを読んでみる</a></li>
+    <li><a href="#合成を試す-synthesis-starter">合成を試す (Synthesis starter)</a>
+      <ul>
+        <li><a href="#サンプルの回路-demo-design">サンプルの回路 (Demo design)</a></li>
+        <li><a href="#回路を読み込ませる-loading-the-design">回路を読み込ませる (Loading the design)</a></li>
+        <li><a href="#合成する-elaboration">合成する (Elaboration)</a></li>
+        <li><a href="#addr_gen-モジュール-the-addr_gen-module"><code>addr_gen</code> モジュール (The addr_gen module)</a></li>
+        <li><a href="#fifo-モジュール全体-the-full-example"><code>fifo</code> モジュール全体 (The full example)</a></li>
+        <li><a href="#平坦化-flattening">平坦化 (Flattening)</a></li>
+      </ul>
+    </li>
+    <li><a href="#テクノロジマッピング">テクノロジマッピング</a></li>
+    <li><a href="#その他">その他</a></li>
+  </ul>
+</nav></div>
+    </div><div class="content" id="content"><p>卒業研究で、OSSの論理合成ツールであるYosysを少し触ったので、そのときに書いたメモを放流</p>
+<p>(基本的に他の人が読むことを想定して書いてないので、内容はかなり適当)</p>
+<h2 id="yosysのドキュメントを読んでみる">Yosysのドキュメントを読んでみる</h2>
+<p>チュートリアルなどドキュメントは、この辺にまとまってるっぽい
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fyosyshq.readthedocs.io%2fen%2flatest%2f" width="300" height="150" frameborder="0" scrolling="no">
+</iframe></p>
+<h2 id="合成を試す-synthesis-starter">合成を試す (Synthesis starter)</h2>
+<p><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/getting_started/example_synth.html" target="_blank" rel="noopener noreffer ">Synthesis starter - YosysHQ Yosys 0.41-dev documentation</a></p>
+<blockquote>
+<p>このページでは、パッケージ化された iCE40 FPGA 合成スクリプト synth_ice40 のウォークスルーをガイドします。簡単なデザインを各ステップを通して、呼び出されるコマンドと、それらがデザインに与える影響について見ていきます。synth_ice40 は iCE40 プラットフォーム固有のものですが、これから説明する操作のほとんどは、FPGA 合成スクリプトの大部分で共通です。したがって、本書は、実際に使用されるアーキテクチャに関係なく、Yosysにおける合成がどのように実行されるかについて、基礎的な理解を深めるのに役立ちます。</p>
+</blockquote>
+<h3 id="サンプルの回路-demo-design">サンプルの回路 (Demo design)</h3>
+<ul>
+<li>こういうVerilogのコードで試すらしい
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-verilog" data-lang="verilog"><span class="c1">// address generator/counter
+</span><span class="c1"></span><span class="k">module</span> <span class="n">addr_gen</span> 
+<span class="p">#(</span>  <span class="k">parameter</span> <span class="n">MAX_DATA</span><span class="o">=</span><span class="mh">256</span><span class="p">,</span>
+    <span class="k">localparam</span> <span class="n">AWIDTH</span> <span class="o">=</span> <span class="n">$clog2</span><span class="p">(</span><span class="n">MAX_DATA</span><span class="p">)</span>
+<span class="p">)</span> <span class="p">(</span> <span class="k">input</span> <span class="n">en</span><span class="p">,</span> <span class="n">clk</span><span class="p">,</span> <span class="n">rst</span><span class="p">,</span>
+    <span class="k">output</span> <span class="kt">reg</span> <span class="p">[</span><span class="n">AWIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">addr</span>
+<span class="p">);</span>
+    <span class="k">initial</span> <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+  
+    <span class="c1">// async reset
+</span><span class="c1"></span>    <span class="c1">// increment address when enabled
+</span><span class="c1"></span>    <span class="k">always</span> <span class="p">@(</span><span class="k">posedge</span> <span class="n">clk</span> <span class="k">or</span> <span class="k">posedge</span> <span class="n">rst</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rst</span><span class="p">)</span>
+            <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="k">begin</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">==</span> <span class="n">MAX_DATA</span><span class="o">-</span><span class="mh">1</span><span class="p">)</span>
+                <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">addr</span> <span class="o">&lt;=</span> <span class="n">addr</span> <span class="o">+</span> <span class="mh">1</span><span class="p">;</span>
+        <span class="k">end</span>
+<span class="k">endmodule</span> <span class="c1">//addr_gen
+</span><span class="c1"></span>  
+<span class="c1">// Define our top level fifo entity
+</span><span class="c1"></span><span class="k">module</span> <span class="n">fifo</span> 
+<span class="p">#(</span>  <span class="k">parameter</span> <span class="n">MAX_DATA</span><span class="o">=</span><span class="mh">256</span><span class="p">,</span>
+    <span class="k">localparam</span> <span class="n">AWIDTH</span> <span class="o">=</span> <span class="n">$clog2</span><span class="p">(</span><span class="n">MAX_DATA</span><span class="p">)</span>
+<span class="p">)</span> <span class="p">(</span> <span class="k">input</span> <span class="n">wen</span><span class="p">,</span> <span class="n">ren</span><span class="p">,</span> <span class="n">clk</span><span class="p">,</span> <span class="n">rst</span><span class="p">,</span>
+    <span class="k">input</span> <span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">wdata</span><span class="p">,</span>
+    <span class="k">output</span> <span class="kt">reg</span> <span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">rdata</span><span class="p">,</span>
+    <span class="k">output</span> <span class="kt">reg</span> <span class="p">[</span><span class="nl">AWIDTH:</span><span class="mh">0</span><span class="p">]</span> <span class="n">count</span>
+<span class="p">);</span>
+    <span class="c1">// fifo storage
+</span><span class="c1"></span>    <span class="c1">// sync read before write
+</span><span class="c1"></span>    <span class="kt">wire</span> <span class="p">[</span><span class="n">AWIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">waddr</span><span class="p">,</span> <span class="n">raddr</span><span class="p">;</span>
+    <span class="kt">reg</span> <span class="p">[</span><span class="mh">7</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">data</span> <span class="p">[</span><span class="n">MAX_DATA</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">];</span>
+    <span class="k">always</span> <span class="p">@(</span><span class="k">posedge</span> <span class="n">clk</span><span class="p">)</span> <span class="k">begin</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">wen</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">waddr</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">wdata</span><span class="p">;</span>
+        <span class="n">rdata</span> <span class="o">&lt;=</span> <span class="n">data</span><span class="p">[</span><span class="n">raddr</span><span class="p">];</span>
+    <span class="k">end</span> <span class="c1">// storage
+</span><span class="c1"></span>  
+    <span class="c1">// addr_gen for both write and read addresses
+</span><span class="c1"></span>    <span class="n">addr_gen</span> <span class="p">#(.</span><span class="n">MAX_DATA</span><span class="p">(</span><span class="n">MAX_DATA</span><span class="p">))</span>
+    <span class="n">fifo_writer</span> <span class="p">(</span>
+        <span class="p">.</span><span class="n">en</span>     <span class="p">(</span><span class="n">wen</span><span class="p">),</span>
+        <span class="p">.</span><span class="n">clk</span>    <span class="p">(</span><span class="n">clk</span><span class="p">),</span>
+        <span class="p">.</span><span class="n">rst</span>    <span class="p">(</span><span class="n">rst</span><span class="p">),</span>
+        <span class="p">.</span><span class="n">addr</span>   <span class="p">(</span><span class="n">waddr</span><span class="p">)</span>
+    <span class="p">);</span>
+  
+    <span class="n">addr_gen</span> <span class="p">#(.</span><span class="n">MAX_DATA</span><span class="p">(</span><span class="n">MAX_DATA</span><span class="p">))</span>
+    <span class="n">fifo_reader</span> <span class="p">(</span>
+        <span class="p">.</span><span class="n">en</span>     <span class="p">(</span><span class="n">ren</span><span class="p">),</span>
+        <span class="p">.</span><span class="n">clk</span>    <span class="p">(</span><span class="n">clk</span><span class="p">),</span>
+        <span class="p">.</span><span class="n">rst</span>    <span class="p">(</span><span class="n">rst</span><span class="p">),</span>
+        <span class="p">.</span><span class="n">addr</span>   <span class="p">(</span><span class="n">raddr</span><span class="p">)</span>
+    <span class="p">);</span>
+  
+    <span class="c1">// status signals
+</span><span class="c1"></span>    <span class="k">initial</span> <span class="n">count</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+  
+    <span class="k">always</span> <span class="p">@(</span><span class="k">posedge</span> <span class="n">clk</span> <span class="k">or</span> <span class="k">posedge</span> <span class="n">rst</span><span class="p">)</span> <span class="k">begin</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rst</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">wen</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">ren</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">&lt;=</span> <span class="n">count</span> <span class="o">+</span> <span class="mh">1</span><span class="p">;</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">ren</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">wen</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">&lt;=</span> <span class="n">count</span> <span class="o">-</span> <span class="mh">1</span><span class="p">;</span>
+    <span class="k">end</span>
+  
+<span class="k">endmodule</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<p>FIFO(キュー)を表現するモジュールで、雑に図にするとこんな感じか?</p>
+<p><img
+        class="lazyload"
+        src="https://mikiken.net/svg/loading.min.svg"
+        data-src="https://mikiken.net/posts/yosys-intro/fifo.png"
+        data-srcset="https://mikiken.net/posts/yosys-intro/fifo.png, https://mikiken.net/posts/yosys-intro/fifo.png 1.5x, https://mikiken.net/posts/yosys-intro/fifo.png 2x"
+        data-sizes="auto"
+        alt="/posts/yosys-intro/fifo.png"
+        title="1000003407.jpg" width="1234" height="1008" /></p>
+<h3 id="回路を読み込ませる-loading-the-design">回路を読み込ませる (Loading the design)</h3>
+<p>YosysをインストールしてPATHが通った状態で、以下のコマンドを打つ</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-bash" data-lang="bash">$ yosys fifo.v
+
+-- Parsing <span class="sb">`</span>fifo.v<span class="s1">&#39; using frontend ` -vlog2k&#39;</span> --
+
+1. Executing Verilog-2005 frontend: fifo.v
+Parsing Verilog input from <span class="sb">`</span>fifo.v<span class="s1">&#39; to AST representation.
+</span><span class="s1">Storing AST representation for module `$abstract\addr_gen&#39;</span>.
+Storing AST representation <span class="k">for</span> module <span class="sb">`</span><span class="nv">$abstract</span><span class="se">\f</span>ifo<span class="err">&#39;</span>.
+Successfully finished Verilog frontend.
+</code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>VerilogのコードがASTの表現に変換される
+<ul>
+<li>Verilog FrontendがVerilogのコードをASTに変換する</li>
+<li>詳細は以下を参照
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/yosys_internals/flow/verilog_frontend.html" target="_blank" rel="noopener noreffer ">The Verilog and AST frontends - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="合成する-elaboration">合成する (Elaboration)</h3>
+<p><code>synth_ice40 -top fifo</code> というコマンドを打つと、内部で最適化とかFPGA(ここではiCE40)に対するテクノロジマッピングの処理とかを行うスクリプトが実行される。</p>
+<ul>
+<li>
+<p>スクリプトの中で、実際どういうコマンドが走るかは以下を見ると確認できる</p>
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/synth_ice40.html#cmd-synth_ice40" target="_blank" rel="noopener noreffer ">synth_ice40 - synthesis for iCE40 FPGAs - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+<li>
+<p>スクリプトの最初の <code>begin</code> sectionで実行されるコマンド</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">read_verilog -D ICE40_HX -lib -specify+/ice40/cells_sim.v
+hierarchy -check -top &lt;top&gt;
+proc
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<blockquote>
+<p><code>read_verilog -D ICE40_HX -lib -specify +/ice40/cells_sim.v</code> は iCE40 セル・モデルをロードし、プラットフォーム固有の IP ブロックをデザインに含めることができます。PLL はこの一般的な例で、後でマッピング・パスに頼るのではなく、SB_PLL40_CORE を直接参照する必要があるかもしれません。今回のシンプルなデザインではこれらのIPブロックを使用しないため、このコマンドは省略できます。ハードウェアへのマッピングを開始すると、これらのセル・モデルも必要になるため、後でロードする必要があります。</p>
+</blockquote>
+<ul>
+<li>後ろにいろいろ書いてあるのは、iCE40で使えるIPブロックを読み込ませるためのオプションのよう
+<ul>
+<li>今回はIPを特に使わないので、別になくてもいいっぽい(?)</li>
+<li><code>+/</code> は、Yosys共有ディレクトリへの動的参照です。デフォルトでは <code>/usr/local/share/yosys</code> です。ソースディレクトリからローカルにビルドされたバージョンのYosysを使用する場合、これは同じディレクトリ内の共有フォルダになります。</li>
+</ul>
+</li>
+</ul>
+<p>今回は、<code>synth_ice40</code> の中で走ってるコマンドを一つずつ手で打って実行することで、何が起きているのかを把握する（そして、このFPGA向けの論理合成に留まらない一般的なYosysの合成のフローを理解する）。</p>
+<h3 id="addr_gen-モジュール-the-addr_gen-module"><code>addr_gen</code> モジュール (The addr_gen module)</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-verilog" data-lang="verilog"><span class="c1">// address generator/counter
+</span><span class="c1"></span><span class="k">module</span> <span class="n">addr_gen</span> 
+<span class="p">#(</span>  <span class="k">parameter</span> <span class="n">MAX_DATA</span><span class="o">=</span><span class="mh">256</span><span class="p">,</span>
+	<span class="k">localparam</span> <span class="n">AWIDTH</span> <span class="o">=</span> <span class="n">$clog2</span><span class="p">(</span><span class="n">MAX_DATA</span><span class="p">)</span>
+<span class="p">)</span> <span class="p">(</span> <span class="k">input</span> <span class="n">en</span><span class="p">,</span> <span class="n">clk</span><span class="p">,</span> <span class="n">rst</span><span class="p">,</span>
+	<span class="k">output</span> <span class="kt">reg</span> <span class="p">[</span><span class="n">AWIDTH</span><span class="o">-</span><span class="mh">1</span><span class="o">:</span><span class="mh">0</span><span class="p">]</span> <span class="n">addr</span>
+<span class="p">);</span>
+	<span class="k">initial</span> <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+
+	<span class="c1">// async reset
+</span><span class="c1"></span>	<span class="c1">// increment address when enabled
+</span><span class="c1"></span>	<span class="k">always</span> <span class="p">@(</span><span class="k">posedge</span> <span class="n">clk</span> <span class="k">or</span> <span class="k">posedge</span> <span class="n">rst</span><span class="p">)</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">rst</span><span class="p">)</span>
+			<span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+		<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="k">begin</span>
+			<span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">==</span> <span class="n">MAX_DATA</span><span class="o">-</span><span class="mh">1</span><span class="p">)</span>
+				<span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+			<span class="k">else</span>
+				<span class="n">addr</span> <span class="o">&lt;=</span> <span class="n">addr</span> <span class="o">+</span> <span class="mh">1</span><span class="p">;</span>
+		<span class="k">end</span>
+<span class="k">endmodule</span> <span class="c1">//addr_gen
+</span></code></pre></td></tr></table>
+</div>
+</div><p><code>hierarchy -top addr_gen</code> というコマンドを打つと、<code>addr_gen</code> をトップレベルのモジュールとして宣言できる。そのため、<code>module fifo</code> とかは無視される。</p>
+<ul>
+<li><code>hierachy</code> コマンドは、回路を読み込ませた後、一番最初に実行する必要がある
+<ul>
+<li>後に続くコマンドが、どのモジュールをトップレベルとして処理するかを知る必要があるため</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">yosys&gt; hierarchy -top addr_gen
+
+2. Executing HIERARCHY pass (managing design hierarchy).
+
+3. Executing AST frontend in derive mode using pre-parsed AST for module `\addr_gen&#39;.
+Generating RTLIL representation for module `\addr_gen&#39;.
+
+3.1. Analyzing design hierarchy..
+Top module:  \addr_gen
+
+3.2. Analyzing design hierarchy..
+Top module:  \addr_gen
+Removing unused module `$abstract\fifo&#39;.
+Removing unused module `$abstract\addr_gen&#39;.
+Removed 2 unused modules.
+</code></pre></td></tr></table>
+</div>
+</div><p><code>addr_gen</code> モジュールをYosysに読み込ませて、ブロック図として表示するとこうなる</p>
+<p><img
+        class="lazyload"
+        src="https://mikiken.net/svg/loading.min.svg"
+        data-src="https://mikiken.net/posts/yosys-intro/Untitled.png"
+        data-srcset="https://mikiken.net/posts/yosys-intro/Untitled.png, https://mikiken.net/posts/yosys-intro/Untitled.png 1.5x, https://mikiken.net/posts/yosys-intro/Untitled.png 2x"
+        data-sizes="auto"
+        alt="/posts/yosys-intro/Untitled.png"
+        title="Untitled" width="947" height="508" /></p>
+<ul>
+<li>
+<p>上記のVerilogの <code>always @</code> に含まれている <code>addr &lt;= addr + 1</code> や <code>addr == MAX_DATA - 1</code> といった単純なロジックは、それぞれ <code>$eq</code> とか <code>$add</code> というブロックとして表現されている</p>
+</li>
+<li>
+<p><code>if .. else</code> のような条件分岐や、モジュール内部のメモリ要素などは <code>PROC</code> (process)というブロックによって表現されている</p>
+<ul>
+<li><code>PROC</code> ブロックの2行目は、このブロックが元のVerilogのソースコードのどの位置に対応しているかを表す
+<ul>
+<li>例えば、上図の <code>PROC $1</code> の場合、<code>fifo.v:12.2-20:6</code> なので、以下の部分に対応する</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-verilog" data-lang="verilog"><span class="k">always</span> <span class="p">@(</span><span class="k">posedge</span> <span class="n">clk</span> <span class="k">or</span> <span class="k">posedge</span> <span class="n">rst</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">rst</span><span class="p">)</span>
+            <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">en</span><span class="p">)</span> <span class="k">begin</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">addr</span> <span class="o">==</span> <span class="n">MAX_DATA</span><span class="o">-</span><span class="mh">1</span><span class="p">)</span>
+                <span class="n">addr</span> <span class="o">&lt;=</span> <span class="mh">0</span><span class="p">;</span>
+            <span class="k">else</span>
+                <span class="n">addr</span> <span class="o">&lt;=</span> <span class="n">addr</span> <span class="o">+</span> <span class="mh">1</span><span class="p">;</span>
+        <span class="k">end</span>
+</code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</li>
+<li>
+<p>左上の <code>PROC $4</code> は初期プロセスというらしい</p>
+<ul>
+<li>処理のエントリーポイントを表すみたいな理解でいいのかな</li>
+</ul>
+</li>
+<li>
+<p><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/proc.html" target="_blank" rel="noopener noreffer "><code>proc</code> コマンド</a>を打つと、<code>PROC</code> ブロックをネットリストに変換することができる</p>
+<ul>
+<li>このコマンドは、複数のコマンドからなるマクロである (先述の <code>synth_ice40</code> とかと同じ)</li>
+<li>動作レベルの記述をマルチプレクサやレジスタなどに変換するサブコマンドが実行される
+<ul>
+<li>ターミナルに色々表示されてるはず</li>
+<li>実際どのような処理が行われるかは以下を参照
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/using_yosys/synthesis/proc.html" target="_blank" rel="noopener noreffer ">Converting process blocks - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>回路が最適化されるのを防ぐため、<code>proc -noopt</code> として実行する</p>
+</li>
+</ul>
+<p><img
+        class="lazyload"
+        src="https://mikiken.net/svg/loading.min.svg"
+        data-src="https://mikiken.net/posts/yosys-intro/Untitled%201.png"
+        data-srcset="https://mikiken.net/posts/yosys-intro/Untitled%201.png, https://mikiken.net/posts/yosys-intro/Untitled%201.png 1.5x, https://mikiken.net/posts/yosys-intro/Untitled%201.png 2x"
+        data-sizes="auto"
+        alt="/posts/yosys-intro/Untitled%201.png"
+        title="&lt;code&gt;addr_gen&lt;/code&gt; モジュールに対して、&lt;code&gt;proc -noopt&lt;/code&gt; を実行した結果をブロック図として表示したもの" width="1837" height="576" /></p>
+<p><code>addr_gen</code> モジュールに対して、<code>proc -noopt</code> を実行した結果をブロック図として表示したもの</p>
+<p>この図を見ると、<code>PROC</code> がもう少し具体的なブロックとして表現されていることが確認できる</p>
+<ul>
+<li>例えば <code>if</code> 文は、マルチプレクサのブロック <code>$mux</code> として表現されている</li>
+<li>レジスタは、<code>$adff</code> (Asynchronous D-Flip-Flop)ブロックによって表現されている</li>
+<li>左上に <code>addr[7:0]</code> を <code>8’00000000</code> で初期化するブロックがあるが、これは他のブロックから独立して存在しており、回路として合成できない</li>
+<li>そこで、実際に回路として合成する前に <code>clean</code> コマンドを実行して、このようなfloating wireを削除する必要がある</li>
+<li><code>opt_expr</code> コマンドを実行する
+<ul>
+<li>
+<p>定数の入力を持つ内部のブロックに対して、定数の畳み込みを行ったり、簡単な式(expr)の書き換えを行ったりするらしい</p>
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/opt_expr.html#cmd-opt_expr" target="_blank" rel="noopener noreffer ">opt_expr - perform const folding and simple expression rewriting - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+<li>
+<p>通常、<code>opt_expr</code> は <code>proc</code> の最後で呼び出す</p>
+</li>
+</ul>
+</li>
+<li>なお、複数のコマンドを打つときは、<code>opt_expr; clean</code> のようにセミコロンとスペースで区切ることで、まとめて呼び出すことができる</li>
+</ul>
+<p><img
+        class="lazyload"
+        src="https://mikiken.net/svg/loading.min.svg"
+        data-src="https://mikiken.net/posts/yosys-intro/Untitled%202.png"
+        data-srcset="https://mikiken.net/posts/yosys-intro/Untitled%202.png, https://mikiken.net/posts/yosys-intro/Untitled%202.png 1.5x, https://mikiken.net/posts/yosys-intro/Untitled%202.png 2x"
+        data-sizes="auto"
+        alt="/posts/yosys-intro/Untitled%202.png"
+        title="&lt;code&gt;opt_expr; clean&lt;/code&gt; の実行後に、&lt;code&gt;addr_gen&lt;/code&gt; モジュールをブロック図として表示したもの" width="1325" height="467" /></p>
+<p><code>opt_expr; clean</code> の実行後に、<code>addr_gen</code> モジュールをブロック図として表示したもの</p>
+<p>1つ上の図と比較すると、<code>$2 $eq</code> の定数入力が <code>255</code> から <code>8’00000000</code> になっていることが確認できる。これは、<code>opt_expr</code> を実行したことで、定数入力が32bitから8bitに縮小されたことによる。</p>
+<ul>
+<li>
+<p>最適化パス(Optimization pass)でどのような処理が行われているかは、以下を参照</p>
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/using_yosys/synthesis/opt.html" target="_blank" rel="noopener noreffer ">Optimization passes - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+<li>
+<p>あるコマンドの実行後に <code>opt_expr; clean</code> のように明示的に <code>clean</code> コマンドを呼び出す代わりに、<code>opt_expr;;</code> のようにコマンドの後ろにセミコロンを2つ重ねて書くことで、暗黙的に <code>clean</code> コマンドが実行される</p>
+</li>
+<li>
+<p><code>clean</code> コマンドを実行することで、他のブロックに接続されずに残っている不必要なブロックを削除することができるため、後に続くコマンドでの処理を削減できる場合がある。</p>
+</li>
+</ul>
+<h3 id="fifo-モジュール全体-the-full-example"><code>fifo</code> モジュール全体 (The full example)</h3>
+<ul>
+<li>
+<p><code>hierarchy -check -top fifo</code> を打つ</p>
+<ul>
+<li>トップモジュールを <code>module fifo</code> に設定</li>
+<li><code>-check</code> オプションをつけると、実装が与えられていないモジュールが含まれている場合にエラーを返す（未解決シンボルみたいな感じでは扱えなくなる）</li>
+<li>現状、<code>addr_gen</code> をトップレベルモジュールに設定しているので、以下のコマンドを打つことで、回路を読み込み直す（もちろんYosysのシェル自体を再起動してもよい）</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">yosys&gt; design -reset
+  
+yosys&gt; read_verilog fifo.v
+  
+11. Executing Verilog-2005 frontend: fifo.v
+Parsing Verilog input from `fifo.v&#39; to AST representation.
+Generating RTLIL representation for module `\addr_gen&#39;.
+Generating RTLIL representation for module `\fifo&#39;.
+Successfully finished Verilog frontend.
+  
+yosys&gt; hierarchy -check -top fifo
+  
+12. Executing HIERARCHY pass (managing design hierarchy).
+  
+12.1. Analyzing design hierarchy..
+Top module:  \fifo
+Used module:     \addr_gen
+Parameter \MAX_DATA = 256
+  
+12.2. Executing AST frontend in derive mode using pre-parsed AST for module `\addr_gen&#39;.
+Parameter \MAX_DATA = 256
+Generating RTLIL representation for module `$paramod\addr_gen\MAX_DATA=s32&#39;00000000000000000000000100000000&#39;.
+Parameter \MAX_DATA = 256
+Found cached RTLIL representation for module `$paramod\addr_gen\MAX_DATA=s32&#39;00000000000000000000000100000000&#39;.
+  
+12.3. Analyzing design hierarchy..
+Top module:  \fifo
+Used module:     $paramod\addr_gen\MAX_DATA=s32&#39;00000000000000000000000100000000
+  
+12.4. Analyzing design hierarchy..
+Top module:  \fifo
+Used module:     $paramod\addr_gen\MAX_DATA=s32&#39;00000000000000000000000100000000
+Removing unused module `\addr_gen&#39;.
+Removed 1 unused modules.
+</code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p><code>addr_gen</code> を読み込んだときと異なり、<code>$abstract</code> モジュールが表示されていない</p>
+<ul>
+<li>これは、<code>read_verilog -defer fifo.v</code> のように <code>-defer</code> オプションを渡したから</li>
+<li><code>-defer</code> オプション</li>
+</ul>
+<blockquote>
+<p><code>read_verilog</code> にASTだけを読み込んで、実際のコンパイルを後の <code>hierarchy</code> コマンドに延期するように指示します。これは、モジュールのデフォルトパラメータが合成不可能な無効なコードを生成する場合に便利です。これが、Yosysがコンパイルを自動的に延期する理由であり、デザインをロードした後、常に <code>hierarchy</code> コマンドを最初に実行すべき理由の1つです。このような問題が発生しないことがわかっている場合は、<code>-defer</code> を省略できます。</p>
+</blockquote>
+<ul>
+<li>hierarchyコマンドが何をしているか、後でこれを読む
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/hierarchy.html#cmd-hierarchy" target="_blank" rel="noopener noreffer ">hierarchy - check, expand and clean up design hierarchy - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>先ほどと同様に<code>proc</code> コマンドを実行して、begin sectionを終わらせる</p>
+</li>
+<li>
+<p>回路規模が大きいので、rdataの出力のデータパスだけ図示すると以下のようになる</p>
+<ul>
+<li>回路全体を図示したい場合、<code>show fifo</code> のように打てばOK
+<img
+        class="lazyload"
+        src="https://mikiken.net/svg/loading.min.svg"
+        data-src="https://mikiken.net/posts/yosys-intro/Untitled%203.png"
+        data-srcset="https://mikiken.net/posts/yosys-intro/Untitled%203.png, https://mikiken.net/posts/yosys-intro/Untitled%203.png 1.5x, https://mikiken.net/posts/yosys-intro/Untitled%203.png 2x"
+        data-sizes="auto"
+        alt="/posts/yosys-intro/Untitled%203.png"
+        title="Untitled" width="1965" height="368" /></li>
+</ul>
+</li>
+<li>
+<p>ハイライトされた <code>fifo_reader</code> ブロックは、<code>addr_gen</code> のインスタンスを表している</p>
+<ul>
+<li><code>proc -noopt</code> を実行した後の状態になっている</li>
+<li>型は <code>$paramod\\addr_gen\\MAX_DATA=s32'00000000000000000000000000000000</code>
+<ul>
+<li><code>$paramod</code> はパラメトリックモジュールを表し、<code>MAX_DATA</code> パラメータが指定された値に設定された <code>addr_gen</code> モジュールのインスタンスを表す</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>もう一方のハイライトされてる <code>$memrd</code> ブロックは、Verilogの <code>data</code> という変数に対応してそう?</p>
+<ul>
+<li>どのようなタイプのメモリとして実装されるかは、合成のこの段階では分からない</li>
+<li>ここで <code>$memrd</code> は非同期で、clockとenableが未定義になっている（<code>1’x</code> になっている）</li>
+</ul>
+</li>
+</ul>
+<blockquote>
+<p>もう1つのハイライトされたブロックは <code>$memrd</code> セルである。合成のこの段階では、どのようなタイプのメモリが実装されるかはまだわからないが、<code>rdata &lt;= data[raddr];</code> がメモリからの読み出しとして実装される可能性があることはわかっている。ここでの <code>$memrd</code> セルは非同期であり、クロックとイネーブル信号の両方が未定義であることに注意してください。</p>
+</blockquote>
+<h3 id="平坦化-flattening">平坦化 (Flattening)</h3>
+<p>平坦化(Flattening)を行うことで、あるモジュールがサブモジュールを内包するという階層構造が解消される。このことによって、モジュール間にまたがる最適化を行えるようになる。</p>
+<ul>
+<li>モジュールが具体的な実装に置換されるっぽい
+<ul>
+<li><a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/flatten.html#cmd-flatten" target="_blank" rel="noopener noreffer ">flatten - flatten design - YosysHQ Yosys 0.41-dev documentation</a></li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">yosys&gt; flatten
+
+15. Executing FLATTEN pass (flatten design).
+Deleting now unused module $paramod\addr_gen\MAX_DATA=s32&#39;00000000000000000000000100000000.
+
+yosys&gt; clean
+Removed 3 unused cells and 25 unused wires.
+
+</code></pre></td></tr></table>
+</div>
+</div><p><img
+        class="lazyload"
+        src="https://mikiken.net/svg/loading.min.svg"
+        data-src="https://mikiken.net/posts/yosys-intro/Untitled%204.png"
+        data-srcset="https://mikiken.net/posts/yosys-intro/Untitled%204.png, https://mikiken.net/posts/yosys-intro/Untitled%204.png 1.5x, https://mikiken.net/posts/yosys-intro/Untitled%204.png 2x"
+        data-sizes="auto"
+        alt="/posts/yosys-intro/Untitled%204.png"
+        title="&lt;code&gt;flatten;;&lt;/code&gt; (上記の2コマンドを打ったのと等価)を実行後に、 &lt;code&gt;rdata&lt;/code&gt; の出力のデータパスを図示した様子" width="1701" height="604" /></p>
+<p><code>flatten;;</code> (上記の2コマンドを打ったのと等価)を実行後に、 <code>rdata</code> の出力のデータパスを図示した様子</p>
+<p>ブロックの位置関係は多少変わっているが、</p>
+<ul>
+<li>1つ上の図の <code>fifo_reader</code> というインスタンスが、<code>proc -noopt</code> を実行した後の <code>addr_gen</code> モジュールの具体的な実装に置き換えられている</li>
+<li><code>addr</code> という出力が、<code>fifo_reader.addr</code> という名前に変わり、1つ上の図の、<code>$memrd</code> の <code>$raddr</code> という入力（ワイヤー）に置き換えられている</li>
+</ul>
+<p>ことが確認できる。</p>
+<p>なお、ワイヤーのマージは <code>clean</code> コマンドのpassの中で行われる。</p>
+<ul>
+<li><code>flatten;;</code> した後の出力を見ると確認できる</li>
+</ul>
+<p>また、場合によっては、この段階で <code>tribuf</code> や <code>deminout</code> といったコマンドを実行し、合成対象のアーキテクチャに適した論理ブロックへの変換を行う。</p>
+<ul>
+<li><code>tribuf</code> は、<code>0, 1, Z (ハイインピーダンス)</code> の3値を入力にもつ <code>$mux</code> をトライステートバッファに変換するらしい（あんまりよく理解できてない）</li>
+</ul>
+<p><code>$mux</code> multiplexer</p>
+<p><code>$mul</code> multiplier</p>
+<h2 id="テクノロジマッピング">テクノロジマッピング</h2>
+<p>Yosysのテクノロジマッピング : FPGA向きのテクノロジマッピングがメインっぽい?</p>
+<p>abcをyosysの中で呼ぶこともできる
+遅延とかのパラメータを考慮してテクノロジマッピングしたい場合は、こちらを使った方が良さそう?</p>
+<blockquote>
+<p><code>abc [options] [selection]</code></p>
+<p>This pass uses the ABC tool [1] for technology mapping of yosys&rsquo;s internal gate
+library to a target architecture.</p>
+</blockquote>
+<h2 id="その他">その他</h2>
+<ul>
+<li>
+<p>等価性判定</p>
+<ul>
+<li>Yosysにも等価性判定する機能あるっぽい?</li>
+<li>最適化とか平坦化といった処理はやらない方がいい?</li>
+</ul>
+</li>
+<li>
+<p>Yosysで出力したJSONからネットリストのSVGを出力してくれるツール
+<iframe class="hatenablogcard" style="width:100%;height:150px;" src="https://hatenablog-parts.com/embed?url=https%3a%2f%2fgithub.com%2fnturley%2fnetlistsvg" width="300" height="150" frameborder="0" scrolling="no">
+</iframe></p>
+</li>
+<li>
+<p><code>aigmap</code> コマンド</p>
+<ul>
+<li>and-inverter-graphにマッピングする
+<a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/aigmap.html">https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/aigmap.html</a></li>
+</ul>
+</li>
+<li>
+<p><code>splitnets</code> コマンド</p>
+<ul>
+<li>複数bit幅をもつwireを複数本の1bitのwireに変換する
+<a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/splitnets.html">https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/splitnets.html</a></li>
+</ul>
+</li>
+<li>
+<p><code>clean</code> コマンド</p>
+<ul>
+<li>(実質的に未使用の)冗長なcellやwireを削除
+<a href="https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/clean.html">https://yosyshq.readthedocs.io/projects/yosys/en/latest/cmd/clean.html</a></li>
+</ul>
+</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+    <div class="post-info">
+        <div class="post-info-line">
+            <div class="post-info-mod">
+                <span>Updated on 2025-02-09</span>
+            </div></div>
+        <div class="post-info-line">
+            <div class="post-info-md"><span>
+                            <a class="link-to-markdown" href="https://mikiken.net/posts/yosys-intro/index.md" target="_blank">Read Markdown</a>
+                        </span></div>
+            <div class="post-info-share">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="post-info-more">
+        <section class="post-tags"></section>
+        <section>
+            <span><a href="javascript:void(0);" onclick="window.history.back();">Back</a></span>&nbsp;|&nbsp;<span><a href="https://mikiken.net/">Home</a></span>
+        </section>
+    </div>
+
+    <div class="post-nav"><a href="https://mikiken.net/posts/2024-looking-back/" class="prev" rel="prev" title="2024年を雑に振り返る"><i class="fas fa-angle-left fa-fw" aria-hidden="true"></i>2024年を雑に振り返る</a></div>
+</div>
+</article></div>
+            </main><footer class="footer">
+        <div class="footer-container"><div class="footer-line" itemscope itemtype="http://schema.org/CreativeWork"><i class="far fa-copyright fa-fw" aria-hidden="true"></i><span itemprop="copyrightYear">2023 - 2025</span><span class="author" itemprop="copyrightHolder">&nbsp;<a href="https://twitter.com/mikikeen" target="_blank">mikiken</a></span>&nbsp;|&nbsp;<span class="license"><a rel="license external nofollow noopener noreffer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+        </div>
+    </footer></div>
+
+        <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="Back to Top">
+                <i class="fas fa-arrow-up fa-fw" aria-hidden="true"></i>
+            </a><a href="#" id="view-comments" class="fixed-button" title="View Comments">
+                <i class="fas fa-comment fa-fw" aria-hidden="true"></i>
+            </a>
+        </div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css"><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lazysizes@5.3.2/lazysizes.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/twemoji@14.0.2/dist/twemoji.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/clipboard@2.0.11/dist/clipboard.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/auto-render.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/copy-tex.min.js"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/contrib/mhchem.min.js"></script><script type="text/javascript">window.config={"code":{"copyTitle":"Copy to clipboard","maxShownLines":50},"comment":{},"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"twemoji":true};</script><script type="text/javascript" src="https://mikiken.net/js/theme.min.d5092a1e0b78bb72d42009815fb9c18a930ce42aeea87444fafc535e0506e833.js" integrity="sha256-1QkqHgt4u3LUIAmBX7nBipMM5CruqHRE+vxTXgUG6DM="></script></body>
+</html>

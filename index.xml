@@ -6,6 +6,19 @@
         <generator>Hugo -- gohugo.io</generator><language>ja</language><lastBuildDate>Sun, 20 Aug 2023 17:23:57 &#43;0900</lastBuildDate>
             <atom:link href="https://mikiken.net/index.xml" rel="self" type="application/rss+xml" />
         <item>
+    <title>Yosysを触ってみる</title>
+    <link>https://mikiken.net/posts/yosys-intro/</link>
+    <pubDate>Sun, 09 Feb 2025 00:15:22 &#43;0900</pubDate>
+    <author>mikiken</author>
+    <guid>https://mikiken.net/posts/yosys-intro/</guid>
+    <description><![CDATA[卒業研究で、OSSの論理合成ツールであるYosysを少し触ったので、そのときに書いたメモを放流
+(基本的に他の人が読むことを想定して書いてないので、内容はかなり適当)
+Yosysのドキュメントを読んでみる チュートリアルなどドキュメントは、この辺にまとまってるっぽい 
+合成を試す (Synthesis starter) Synthesis starter - YosysHQ Yosys 0.41-dev documentation
+ このページでは、パッケージ化された iCE40 FPGA 合成スクリプト synth_ice40 のウォークスルーをガイドします。簡単なデザインを各ステップを通して、呼び出されるコマンドと、それらがデザインに与える影響について見ていきます。synth_ice40 は iCE40 プラットフォーム固有のものですが、これから説明する操作のほとんどは、FPGA 合成スクリプトの大部分で共通です。したがって、本書は、実際に使用されるアーキテクチャに関係なく、Yosysにおける合成がどのように実行されるかについて、基礎的な理解を深めるのに役立ちます。
+ サンプルの回路 (Demo design)  こういうVerilogのコードで試すらしい 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64 65 66 67 68 69 70 71  // address generator/counter module addr_gen #( parameter MAX_DATA=256, localparam AWIDTH = $clog2(MAX_DATA) ) ( input en, clk, rst, output reg [AWIDTH-1:0] addr ); initial addr &lt;= 0; // async reset  // increment address when enabled  always @(posedge clk or posedge rst) if (rst) addr &lt;= 0; else if (en) begin if (addr == MAX_DATA-1) addr &lt;= 0; else addr &lt;= addr + 1; end endmodule //addr_gen  // Define our top level fifo entity module fifo #( parameter MAX_DATA=256, localparam AWIDTH = $clog2(MAX_DATA) ) ( input wen, ren, clk, rst, input [7:0] wdata, output reg [7:0] rdata, output reg [AWIDTH:0] count ); // fifo storage  // sync read before write  wire [AWIDTH-1:0] waddr, raddr; reg [7:0] data [MAX_DATA-1:0]; always @(posedge clk) begin if (wen) data[waddr] &lt;= wdata; rdata &lt;= data[raddr]; end // storage  // addr_gen for both write and read addresses  addr_gen #(.]]></description>
+</item>
+<item>
     <title>2024年を雑に振り返る</title>
     <link>https://mikiken.net/posts/2024-looking-back/</link>
     <pubDate>Tue, 31 Dec 2024 02:34:36 &#43;0900</pubDate>
