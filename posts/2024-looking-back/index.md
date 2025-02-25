@@ -89,6 +89,8 @@
 - ヤフオクで買ったジャンクのLet's noteの基板にProxmoxを入れて遊んでいた
 {{<cardlink url="https://zenn.dev/mikiken/articles/proxmox-introduction">}}
 {{<tweet 1845437257039348154>}}
+- Zennの記事が謎に伸びて一瞬トップページに載ってた
+![ZennのトップページにProxmoxの記事が一瞬載った](zenn_top.png)
 
 ### 11月
 - [CAMPHOR-](https://camph.net)でSYCLにデータ並列プログラミング入門するイベントに参加した
